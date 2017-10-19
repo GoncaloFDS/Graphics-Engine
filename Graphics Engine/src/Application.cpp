@@ -81,7 +81,7 @@ void Application::idle() {
 }
 
 void Application::drawScene() {
-	glUseProgram(shader->programId);
+	glUseProgram(shader->ID);
 
 	GLint matrixUniform = shader->getUniform("Matrix");
 	GLint colorUniform = shader->getUniform("Color");
