@@ -1,43 +1,188 @@
 ﻿#include "Application.h"
+#include "Mat4.h"
+#include "Shader.h"
 
-Application::Application(const Vec2 win, const char* caption) {
-	setupGLFW(win, caption);
-	setupGLEW();
-	setupOpenGL();
+#define PI 3.1415927
+
+int Application::windowHandle;
+int Application::frameCount;
+Vec2 Application::win_;
+std::string Application::caption;
+
+GLuint Application::VAO[3];
+GLuint Application::VBO[3];
+GLuint Application::EBO[2];
+Shader* Application::shader;
+
+Application::Application(int argc, char* argv[], const Vec2 win) {
+	win_ = win;
+	windowHandle = 0;
+	frameCount = 0;
+	caption = "CGJ Engine";
+
+	setUpGlut(argc, argv, win);
+	setUpGlew();
+	setUpOpenGl();
+	createShaderProgram();
+	createBufferObjects();
+	setUpCallBacks();
 }
 
-GLFWwindow* Application::getWindow(){
-	return m_window;
+bool Application::isOpenGlError() {
+
+	bool isError = false;
+	GLenum errCode;
+	while ((errCode = glGetError()) != GL_NO_ERROR) {
+		isError = true;
+		const GLubyte* errString = gluErrorString(errCode);
+		std::cerr << "OpenGL ERROR [" << errString << "]." << std::endl;
+	}
+	return isError;
+
 }
 
-void Application::setupGLFW(Vec2 win, const char* caption) {
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-	m_window = glfwCreateWindow(win.x, win.y, caption, NULL, NULL);
-	if (m_window == NULL) {
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
+void Application::checkOpenGlError(const std::string error) {
+	if (isOpenGlError()) {
+		std::cerr << error << std::endl;
+		std::cin.get();
 		exit(EXIT_FAILURE);
 	}
-	glfwMakeContextCurrent(m_window);
 }
 
-void Application::setupGLEW() {
+void Application::checkOpenGlInfo() {
+	const GLubyte* renderer = glGetString(GL_RENDERER);
+	const GLubyte* vendor = glGetString(GL_VENDOR);
+	const GLubyte* version = glGetString(GL_VERSION);
+	const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+	std::cerr << "OpenGL Renderer: " << renderer << " (" << vendor << ")" << std::endl;
+	std::cerr << "OpenGL version " << version << std::endl;
+	std::cerr << "GLSL version " << glslVersion << std::endl;
+}
+
+void Application::timer(int value) {
+
+	std::ostringstream oss;
+	oss << caption << ": " << frameCount << " FPS @ (" << win_.x << "x" << win_.y << ")";
+	std::string s = oss.str();
+	glutSetWindow(windowHandle);
+	glutSetWindowTitle(s.c_str());
+	frameCount = 0;
+	glutTimerFunc(1000, timer, 0);
+}
+
+void Application::reshape(int x, int y) {
+	win_.x = x;
+	win_.y = y;
+	glViewport(0, 0, x, y);
+}
+
+void Application::idle() {
+	glutPostRedisplay();
+}
+
+void Application::drawScene() {
+	glUseProgram(shader->programId);
+
+	GLint matrixUniform = shader->getUniform("Matrix");
+	GLint colorUniform = shader->getUniform("Color");
+	Mat4 worldScale = Mat4::Scale(Vec3(0.5f, 0.5f, 0.5f));
+	Mat4 srt;
+
+	glBindVertexArray(VAO[0]); 
+	
+	//Cube
+	glUniform4fv(colorUniform, 1, Vec4(0, 1, 0, 1).asArray());
+	srt = Mat4::Translate(Vec3(0.75f, 0.15f, 0.0f)) * Mat4::Rotate(PI/4.f, Vec3(0.0f, 0.0f, 1.0f) ) * worldScale;
+	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (GLvoid*)0);
+
+	glBindVertexArray(VAO[1]); 
+	
+	//Triangle small 1
+	glUniform4fv(colorUniform, 1, Vec4(1, 0, 0, 1).asArray());
+	srt = Mat4::Translate(Vec3(0.75f, -0.23f, 0)) * Mat4::Rotate(-PI/4.f, Vec3(0,0,1)) * worldScale;
+	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
+	glDrawArrays(GL_TRIANGLES, 0, 3);	
+	//Triangle small 2
+	glUniform4fv(colorUniform, 1, Vec4(0.66f, 0.31f, 0.76f, 1).asArray());
+	srt = Mat4::Translate(Vec3(-0.05f, -0.62f, 0))* worldScale;
+	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//Triangle medium
+	glUniform4fv(colorUniform, 1, Vec4(1, 0.61f, 0.82f, 1).asArray());
+	srt = Mat4::Translate(Vec3(0.28f, 0.25f, 0)) * Mat4::Rotate(-PI / 4.f, Vec3(0.0f, 0.0f, 1)) * Mat4::Scale(Vec3(1.5f, 1.5f, 1.5f))* worldScale;
+	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
+	glDrawArrays(GL_TRIANGLES, 0.0f, 3);	
+	//Triangle large 1
+	glUniform4fv(colorUniform, 1, Vec4(0.0f, 0.61f, 1 ,1).asArray());
+	srt = Mat4::Translate(Vec3(-0.475f, 0.245f, 0.0f)) * Mat4::Rotate(-3*PI/4, Vec3(0, 0.0f, 1)) * Mat4::Scale(Vec3(2, 2, 2)) * worldScale;
+	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
+	glDrawArrays(GL_TRIANGLES, 0, 3);	
+	//Triangle large 2
+	glUniform4fv(colorUniform, 1, Vec4(1, 0.61f, 0, 1).asArray());
+	srt = Mat4::Translate(Vec3(-0.1f, 0.1f, 0.0f)) * Mat4::Rotate(-PI/2, Vec3(0.0f, 0.0f, 1)) * Mat4::Scale(Vec3(2, 2, 2)) * worldScale;
+	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	glBindVertexArray(VAO[2]); 
+	
+	//Parallelogram
+	glUniform4fv(colorUniform, 1, Vec4(1, 1, 0, 1).asArray());
+	srt = Mat4::Translate(Vec3(-0.375f, -0.38f, 0.0f)) * worldScale;
+	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (GLvoid*)0);
+
+	glUseProgram(0);
+	glBindVertexArray(0);
+
+	checkOpenGlError("ERROR: Could not draw scene.");
+}
+
+void Application::display() {
+	++frameCount;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	drawScene();
+	glutSwapBuffers();
+}
+
+void Application::cleanUp() {
+	glDeleteVertexArrays(3, VAO);
+	glDeleteBuffers(3, VBO);
+	glDeleteBuffers(3, EBO);
+
+	checkOpenGlError("ERROR: Could not destroy VAOs and VBOs.");
+}
+
+void Application::setUpGlut(int argc, char** argv, const Vec2 win) {
+	glutInit(&argc, argv);
+
+	glutInitContextVersion(3, 3);
+	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
+	glutInitContextProfile(GLUT_CORE_PROFILE);
+
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+
+	glutInitWindowSize(win.x, win.y);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	windowHandle = glutCreateWindow("CGJ Engine");
+	if (windowHandle < 1) {
+		std::cerr << "ERROR: Could not create a new rendering window." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+void Application::setUpGlew() {
 	glewExperimental = GL_TRUE;
 	GLenum result = glewInit();
 	if (result != GLEW_OK) {
 		std::cerr << "ERROR glewInit: " << glewGetString(result) << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	GLenum err_code = glGetError();
+	GLenum errCode = glGetError(); //Ignores one error
 }
 
-void Application::setupOpenGL() {
-	checkOpenGLInfo();
+void Application::setUpOpenGl() const {
+	checkOpenGlInfo();
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
@@ -49,12 +194,95 @@ void Application::setupOpenGL() {
 	glFrontFace(GL_CCW);
 }
 
-void Application::checkOpenGLInfo() {
-	const GLubyte *renderer = glGetString(GL_RENDERER);
-	const GLubyte *vendor = glGetString(GL_VENDOR);
-	const GLubyte *version = glGetString(GL_VERSION);
-	const GLubyte *glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-	std::cerr << "OpenGL Renderer: " << renderer << " (" << vendor << ")" << std::endl;
-	std::cerr << "OpenGL version " << version << std::endl;
-	std::cerr << "GLSL version " << glslVersion << std::endl;
+void Application::createShaderProgram() const {
+	shader = new Shader("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
+	//shader->addAttribute("in_Position");
+	checkOpenGlError("ERROR: Could not create shaders.");
+}
+
+void Application::createCubeBuffers() const {
+	const float cubeVertices[]{
+		0.0f, 0.5f, 0.0f, 1.0f,
+		-0.5f, 0.0f, 0.0f, 1.0f,
+		0.0f, -0.5f, 0.0f, 1.0f,
+		0.5f, 0.0f, 0.0f, 1.0f
+	};
+	const GLubyte indices[] = { 0,1,3, 1,2,3 };
+
+	glBindVertexArray(VAO[0]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void Application::createTriangleBuffers() {
+	const float triangleVertices[]{
+		0.0f, 0.5f, 0.0f, 1.0f,
+		-0.5f, 0.0f, 0.0f, 1.0f,
+		0.5f, 0.0f, 0.0f, 1.0f
+	};
+
+	glBindVertexArray(VAO[1]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void Application::createParallelogramBuffers() {
+	const float parallVertices[]{
+		0.0f, 0.0f, 0.0f, 1.0f,
+		0.5f, 0.5f, 0.0f, 1.0f,
+		-0.5f, 0.5f, 0.0f, 1.0f,
+		-1.0f, 0.0f, 0.0f, 1.0f
+	};
+
+	const GLubyte indices[] = { 0,1,3, 1,2,3 };
+	glBindVertexArray(VAO[2]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(parallVertices), parallVertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void Application::createBufferObjects() {
+	glGenVertexArrays(3, VAO);
+	glGenBuffers(3, VBO);
+	glGenBuffers(2, EBO);
+
+	createCubeBuffers();
+	createTriangleBuffers();
+	createParallelogramBuffers();
+
+	checkOpenGlError("ERROR: Could not create VAOs and VBOs.");
+}
+
+void Application::setUpCallBacks() {
+	glutCloseFunc(cleanUp);
+	glutDisplayFunc(display);
+	glutIdleFunc(idle);
+	glutReshapeFunc(reshape);
+	glutTimerFunc(0, timer, 0);
 }

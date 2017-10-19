@@ -1,24 +1,47 @@
 ﻿#pragma once
-#include "CGMath/Vec2.h"
+#include "Vec2.h"
 #include "GL/glew.h"
-#include "GLFW/glfw3.h"
+#include "GL/freeglut.h"
 #include <iostream>
 #include <string>
+#include "Shader.h"
+#include "Vec4.h"
 
+typedef struct {
+	Vec4 xyzw;
+} Vertex;
 
 class Application {
-
 public:
-	Application(Vec2 win, const char* caption);
-	GLFWwindow* getWindow();
+	Application(int argc, char* argv[], Vec2 win);
 
 private:
-	GLFWwindow* m_window;
-	
-	void setupGLFW(Vec2 win, const char* caption);
-	void setupGLEW();
-	void setupOpenGL();
+	static int windowHandle;
+	static int frameCount;
+	static Vec2 win_;
+	static std::string caption;
+	static Shader *shader;
+	static GLuint VAO[3], VBO[3], EBO[2];
 
-	void checkOpenGLInfo();
+	static bool isOpenGlError();
+	static void checkOpenGlError(std::string error);
+	static void checkOpenGlInfo();
+
+	static void timer(int value);
+	static void reshape(int x, int y);
+	static void idle();
+	static void drawScene();
+	static void display();
+	static void cleanUp();
+
+	void setUpGlut(int argc, char** argv, const Vec2 win);
+	void setUpGlew();
+	void setUpOpenGl() const;
+	void createShaderProgram() const;
+	void createCubeBuffers() const;
+	void createTriangleBuffers();
+	void createParallelogramBuffers();
+	void createBufferObjects();
+	void setUpCallBacks();
+
 };
-
