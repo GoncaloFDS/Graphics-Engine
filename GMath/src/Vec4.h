@@ -3,13 +3,14 @@
 
 struct Vec4 {
 	float x, y, z, w;
-	
+
+
 	Vec4() = default;
 	~Vec4() = default;
 	Vec4(float a, float b, float c, float d);
 	Vec4(const Vec3& v,  float d);
 
-	float* asArray() const;
+	float* asArray();
 
 	bool operator==(const Vec4& other) const;
 	bool operator!=(const Vec4& other) const;
@@ -32,6 +33,7 @@ struct Vec4 {
 	friend std::ostream& operator<<(std::ostream& stream, const Vec4& vector);
 
 private:
+	float v[4];
 	Vec4& Add(const Vec4& other);
 	Vec4& Subtract(const Vec4& other);
 	Vec4& Multiply(const Vec4& other);

@@ -7,8 +7,11 @@ Vec4::Vec4(float a, float b, float c, float d)
 Vec4::Vec4(const Vec3& v, float d) 
 	: x(v.x), y(v.y), z(v.z), w(w) {}
 
-float* Vec4::asArray() const {
-	float v[4] = { x, y, z, w };
+float* Vec4::asArray() {
+	v[0] = x;
+	v[1] = y;
+	v[2] = z;
+	v[3] = w;
 	return v;
 }
 
