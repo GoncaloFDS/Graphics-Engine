@@ -8,7 +8,7 @@
 #include "Application.h"
 
 void init(int argc, char* argv[]) {
-	Application app(argc, argv, Vec2(800, 800));
+	Application app(argc, argv, Vec2(700, 700));
 
 }
 
