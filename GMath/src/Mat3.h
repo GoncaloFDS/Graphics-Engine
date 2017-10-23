@@ -24,17 +24,6 @@ struct Mat3 {
 	float Get(int i, int j);
 	friend std::ostream& operator<<(std::ostream& os, const Mat3& m);
 
-	static Mat3 Identity();
-	static Mat3 Rotate(const float angle, Vec3& axis);
-	static Mat3 Scale(const Vec3& s);
-
-	static Mat3 Translation(const Vec2& axis);
-	static Mat3 Transpose(const Mat3& matrix);
-	static Mat3 Inverse(Mat3& matrix);
-
-	static Mat3 CrossMatrix(const Vec3& v);
-	static Mat3 SqrCrossMatrix(const Vec3& v);
-
 	float Determinant();
 
 	friend Mat3 operator*(Mat3 left, const Mat3& right);

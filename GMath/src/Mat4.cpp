@@ -1,6 +1,7 @@
 #include "Mat4.h"
 #include "MathExceptions.h"
 #include "Mat3.h"
+#include "../../Graphics Engine/src/MatrixFactory.h"
 
 
 /* OpenGl Column major format
@@ -47,8 +48,8 @@ float Mat4::Get(int i, int j) {
 std::ostream& operator<<(std::ostream& os, const Mat4& m) {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++)
-			std::cout << m.entry[i * 4 + j] << "\t";
-		std::cout << std::endl;
+			os<< m.entry[i * 4 + j] << "\t\t";
+		os << std::endl;
 	}
 	return os;
 }
@@ -68,10 +69,6 @@ void Mat4::Clean() {
 	for (int i = 0; i < 16; i++)
 		if (fabs(entry[i]) < CloseTozero)
 			entry[i] = 0.f;
-}
-
-Mat4 Mat4::Identity() {
-	return Mat4(1.f);
 }
 
 Mat4 operator*(const Mat4 left, const Mat4& right) {
@@ -190,36 +187,9 @@ Mat4 Mat4::operator*=(const float scalar) {
 	return *this;
 }
 
-Mat4 Mat4::Translate(const Vec3& translation) {
-	Mat4 result(1.0f);
-
-	result.entry[3] = translation.x;
-	result.entry[7] = translation.y;
-	result.entry[11] = translation.z;
-
-	return result;
-}
-
-Mat4 Mat4::Rotate(const float angle, Vec3& axis) {
-	return Mat4(Mat3::Rotate(angle, axis));
-}
-
-Mat4 Mat4::Scale(const Vec3& scale) {
-	return Mat4(Mat3::Scale(scale));
-}
-
-Mat4 Mat4::Transpose(const Mat4& m) {
-	return Mat4 {
-		m.entry[0], m.entry[4], m.entry[8],	m.entry[12], 
-		m.entry[1], m.entry[5], m.entry[9], m.entry[13], 
-		m.entry[2], m.entry[6], m.entry[10], m.entry[14], 
-		m.entry[3], m.entry[7], m.entry[11], m.entry[15], 
-	};
-}
-
 Mat4::~Mat4() = default;
 
 Mat4 Mat4::RowMajor() {
-	return Transpose(Mat4(*this));
+	return MatrixFactory::Transpose(Mat4(*this));
 }
 

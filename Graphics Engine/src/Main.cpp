@@ -16,12 +16,12 @@ int main(int argc, char* argv[]) {
 	try {
 		init(argc, argv);
 		glutMainLoop();
-		
+
 		exit(EXIT_SUCCESS);
 	}
 	catch (...) {
 		std::cerr << "Exception on main" << std::endl;
 		std::cin.get();
 	}
-	
+
 }

@@ -13,11 +13,13 @@ class Shader {
 public:
 	// the program ID
 	GLuint ID;
+
 	enum Type {
 		Program,
 		Vertex,
 		Fragment
 	};
+
 	// constructor reads and builds the shader
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
 	~Shader();
@@ -26,7 +28,7 @@ public:
 	GLint getUniform(const char* str) const;
 
 private:
-	void checkCompileErrors(const GLuint shader, const Shader::Type type) const;
+	void checkCompileErrors(const GLuint shader, const Type type) const;
 };
 
 #endif

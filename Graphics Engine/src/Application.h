@@ -20,7 +20,7 @@ private:
 	static int frameCount;
 	static Vec2 win_;
 	static std::string caption;
-	static Shader *shader;
+	static Shader* shader;
 	static GLuint VAO[3], VBO[3], EBO[2];
 
 	static bool isOpenGlError();

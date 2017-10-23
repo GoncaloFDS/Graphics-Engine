@@ -1,8 +1,9 @@
 ﻿#include "Application.h"
-#include "Mat4.h"
+#include "MatrixFactory.h"
 #include "Shader.h"
 
 #define PI 3.1415927
+
 
 int Application::windowHandle;
 int Application::frameCount;
@@ -83,52 +84,56 @@ void Application::idle() {
 void Application::drawScene() {
 	glUseProgram(shader->ID);
 
-	GLint matrixUniform = shader->getUniform("Matrix");
+	GLint matrixUniform = shader->getUniform("ModelMatrix");
 	GLint colorUniform = shader->getUniform("Color");
-	Mat4 worldScale = Mat4::Scale(Vec3(0.5f, 0.5f, 0.5f));
+	Mat4 worldScale = MatrixFactory::Scale(Vec3(0.5f, 0.5f, 0.5f));
 	Mat4 srt;
 
-	glBindVertexArray(VAO[0]); 
-	
+	glBindVertexArray(VAO[0]);
+
 	//Cube
 	glUniform4fv(colorUniform, 1, Vec4(0, 1, 0, 1).asArray());
-	srt = Mat4::Translate(Vec3(0.75f, 0.15f, 0.0f)) * Mat4::Rotate(PI/4.f, Vec3(0.0f, 0.0f, 1.0f) ) * worldScale;
+	srt = MatrixFactory::Translate(Vec3(0.75f, 0.15f, 0.0f)) * MatrixFactory::Rotate(PI / 4.f, Vec3(0.0f, 0.0f, 1.0f)) *
+		worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (GLvoid*)0);
 
-	glBindVertexArray(VAO[1]); 
-	
+	glBindVertexArray(VAO[1]);
+
 	//Triangle small 1
 	glUniform4fv(colorUniform, 1, Vec4(1, 0, 0, 1).asArray());
-	srt = Mat4::Translate(Vec3(0.75f, -0.23f, 0)) * Mat4::Rotate(-PI/4.f, Vec3(0,0,1)) * worldScale;
+	srt = MatrixFactory::Translate(Vec3(0.75f, -0.23f, 0)) * MatrixFactory::Rotate(-PI / 4.f, Vec3(0, 0, 1)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 3);	
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 	//Triangle small 2
 	glUniform4fv(colorUniform, 1, Vec4(0.66f, 0.31f, 0.76f, 1).asArray());
-	srt = Mat4::Translate(Vec3(-0.05f, -0.62f, 0))* worldScale;
+	srt = MatrixFactory::Translate(Vec3(-0.05f, -0.62f, 0)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	//Triangle medium
 	glUniform4fv(colorUniform, 1, Vec4(1, 0.61f, 0.82f, 1).asArray());
-	srt = Mat4::Translate(Vec3(0.28f, 0.25f, 0)) * Mat4::Rotate(-PI / 4.f, Vec3(0.0f, 0.0f, 1)) * Mat4::Scale(Vec3(1.5f, 1.5f, 1.5f))* worldScale;
+	srt = MatrixFactory::Translate(Vec3(0.28f, 0.25f, 0)) * MatrixFactory::Rotate(-PI / 4.f, Vec3(0.0f, 0.0f, 1)) *
+		MatrixFactory::Scale(Vec3(1.5f, 1.5f, 1.5f)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0.0f, 3);	
+	glDrawArrays(GL_TRIANGLES, 0.0f, 3);
 	//Triangle large 1
-	glUniform4fv(colorUniform, 1, Vec4(0.0f, 0.61f, 1 ,1).asArray());
-	srt = Mat4::Translate(Vec3(-0.475f, 0.245f, 0.0f)) * Mat4::Rotate(-3*PI/4, Vec3(0, 0.0f, 1)) * Mat4::Scale(Vec3(2, 2, 2)) * worldScale;
+	glUniform4fv(colorUniform, 1, Vec4(0.0f, 0.61f, 1, 1).asArray());
+	srt = MatrixFactory::Translate(Vec3(-0.475f, 0.245f, 0.0f)) * MatrixFactory::Rotate(-3 * PI / 4, Vec3(0, 0.0f, 1)) *
+		MatrixFactory::Scale(Vec3(2, 2, 2)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 3);	
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 	//Triangle large 2
 	glUniform4fv(colorUniform, 1, Vec4(1, 0.61f, 0, 1).asArray());
-	srt = Mat4::Translate(Vec3(-0.1f, 0.1f, 0.0f)) * Mat4::Rotate(-PI/2, Vec3(0.0f, 0.0f, 1)) * Mat4::Scale(Vec3(2, 2, 2)) * worldScale;
+	srt = MatrixFactory::Translate(Vec3(-0.1f, 0.1f, 0.0f)) * MatrixFactory::Rotate(-PI / 2, Vec3(0.0f, 0.0f, 1)) *
+		MatrixFactory::Scale(Vec3(2, 2, 2)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	glBindVertexArray(VAO[2]); 
-	
+	glBindVertexArray(VAO[2]);
+
 	//Parallelogram
 	glUniform4fv(colorUniform, 1, Vec4(1, 1, 0, 1).asArray());
-	srt = Mat4::Translate(Vec3(-0.375f, -0.38f, 0.0f)) * worldScale;
+	srt = MatrixFactory::Translate(Vec3(-0.375f, -0.38f, 0.0f)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (GLvoid*)0);
 
@@ -196,7 +201,6 @@ void Application::setUpOpenGl() const {
 
 void Application::createShaderProgram() const {
 	shader = new Shader("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
-	//shader->addAttribute("in_Position");
 	checkOpenGlError("ERROR: Could not create shaders.");
 }
 
@@ -205,9 +209,20 @@ void Application::createCubeBuffers() const {
 		0.0f, 0.5f, 0.0f, 1.0f,
 		-0.5f, 0.0f, 0.0f, 1.0f,
 		0.0f, -0.5f, 0.0f, 1.0f,
-		0.5f, 0.0f, 0.0f, 1.0f
+		0.5f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.5f, 1.0f, 1.0f,
+		-0.5f, 0.0f, 1.0f, 1.0f,
+		0.0f, -0.5f, 1.0f, 1.0f,
+		0.5f, 0.0f, 1.0f, 1.0f
 	};
-	const GLubyte indices[] = { 0,1,3, 1,2,3 };
+	const GLubyte indices[] = {
+		0,1,2,	0,2,3, //front
+		0,3,7,	0,4,7, //right
+		0,1,5,	0,4,5, //top
+		2,3,7,	2,6,7, //bot
+		1,2,6,	1,5,6, //left
+		4,5,6,	4,6,7 //back
+	};
 
 	glBindVertexArray(VAO[0]);
 
@@ -251,7 +266,7 @@ void Application::createParallelogramBuffers() {
 		-1.0f, 0.0f, 0.0f, 1.0f
 	};
 
-	const GLubyte indices[] = { 0,1,3, 1,2,3 };
+	const GLubyte indices[] = {0,1,3, 1,2,3};
 	glBindVertexArray(VAO[2]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
@@ -275,6 +290,21 @@ void Application::createBufferObjects() {
 	createCubeBuffers();
 	createTriangleBuffers();
 	createParallelogramBuffers();
+
+	checkOpenGlError("ERROR: 1.");
+	shader->use();
+
+	GLuint shaderID = shader->ID;
+	GLuint viewLoc = shader->getUniform("ViewMatrix");
+	Mat4 m = MatrixFactory::LookAt(Vec3(0, 0, -5), Vec3(0, 0, 0), Vec3(0, 1, 0));
+	std::cout << m << std::endl;
+	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MatrixFactory::LookAt(Vec3(5, 5, 5), Vec3(0, 0, 0), Vec3(0, 1, 0)).entry);
+
+	GLuint projLoc = shader->getUniform("ProjectionMatrix");
+	m = MatrixFactory::Perspective(PI / 6.f, 640.f / 480.f, 1, 10);
+	std::cout << m << std::endl;
+	glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Perspective(PI/6.f, 640.f/480.f, 1, 10).entry);
+	//glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Ortho(-2, 2, 2, -2, 1, 10).entry);
 
 	checkOpenGlError("ERROR: Could not create VAOs and VBOs.");
 }

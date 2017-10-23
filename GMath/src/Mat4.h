@@ -20,17 +20,12 @@ struct Mat4 {
 	Mat4 RowMajor();
 
 	float Get(int i, int j);
+	friend std::ostream& operator<<(std::ostream& os, const Mat4& m);
+	
 	bool operator==(Mat4& other) const;
 	bool operator!=(Mat4& other) const;
 
 	void Clean();
-
-	static Mat4 Identity();
-	static Mat4 Translate(const Vec3& translation);
-	static Mat4 Rotate(const float angle, Vec3& axis);
-	static Mat4 Scale(const Vec3& scale);
-
-	static Mat4 Transpose(const Mat4& matrix);
 
 	friend Mat4 operator*(Mat4 left, const Mat4& right);
 	Mat4& operator*=(const Mat4& other);
