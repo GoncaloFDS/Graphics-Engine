@@ -60,6 +60,18 @@ GLint Shader::getUniform(const char* uniformName) const {
 	return glGetUniformLocation(ID, uniformName);
 }
 
+GLuint Shader::bindAttribute(const char* attributeName) {
+	// Add the attribute location value for the attributeName key
+	attributeMap[attributeName] = glGetAttribLocation(ID, attributeName);
+
+	// Check to ensure that the shader contains an attribute with this name
+	if (attributeMap[attributeName] == -1) {
+		std::cout << "Could not add attribute: " << attributeName;
+	}
+	// Return the attribute location
+	return attributeMap[attributeName];
+}
+
 
 void Shader::checkCompileErrors(const GLuint shader, const Type type) const {
 	GLint success;

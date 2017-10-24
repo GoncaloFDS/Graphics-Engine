@@ -7,12 +7,14 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <map>
 
 
 class Shader {
 public:
 	// the program ID
 	GLuint ID;
+	std::map<std::string, int> attributeMap;
 
 	enum Type {
 		Program,
@@ -26,6 +28,7 @@ public:
 
 	void use() const;
 	GLint getUniform(const char* str) const;
+	GLuint bindAttribute(const char* attrbName);
 
 private:
 	void checkCompileErrors(const GLuint shader, const Type type) const;

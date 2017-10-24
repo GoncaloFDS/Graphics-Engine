@@ -29,37 +29,6 @@ Application::Application(int argc, char* argv[], const Vec2 win) {
 	setUpCallBacks();
 }
 
-bool Application::isOpenGlError() {
-
-	bool isError = false;
-	GLenum errCode;
-	while ((errCode = glGetError()) != GL_NO_ERROR) {
-		isError = true;
-		const GLubyte* errString = gluErrorString(errCode);
-		std::cerr << "OpenGL ERROR [" << errString << "]." << std::endl;
-	}
-	return isError;
-
-}
-
-void Application::checkOpenGlError(const std::string error) {
-	if (isOpenGlError()) {
-		std::cerr << error << std::endl;
-		std::cin.get();
-		exit(EXIT_FAILURE);
-	}
-}
-
-void Application::checkOpenGlInfo() {
-	const GLubyte* renderer = glGetString(GL_RENDERER);
-	const GLubyte* vendor = glGetString(GL_VENDOR);
-	const GLubyte* version = glGetString(GL_VERSION);
-	const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-	std::cerr << "OpenGL Renderer: " << renderer << " (" << vendor << ")" << std::endl;
-	std::cerr << "OpenGL version " << version << std::endl;
-	std::cerr << "GLSL version " << glslVersion << std::endl;
-}
-
 void Application::timer(int value) {
 
 	std::ostringstream oss;
@@ -158,47 +127,6 @@ void Application::cleanUp() {
 	checkOpenGlError("ERROR: Could not destroy VAOs and VBOs.");
 }
 
-void Application::setUpGlut(int argc, char** argv, const Vec2 win) {
-	glutInit(&argc, argv);
-
-	glutInitContextVersion(3, 3);
-	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
-	glutInitContextProfile(GLUT_CORE_PROFILE);
-
-	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-
-	glutInitWindowSize(win.x, win.y);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	windowHandle = glutCreateWindow("CGJ Engine");
-	if (windowHandle < 1) {
-		std::cerr << "ERROR: Could not create a new rendering window." << std::endl;
-		exit(EXIT_FAILURE);
-	}
-}
-
-void Application::setUpGlew() {
-	glewExperimental = GL_TRUE;
-	GLenum result = glewInit();
-	if (result != GLEW_OK) {
-		std::cerr << "ERROR glewInit: " << glewGetString(result) << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	GLenum errCode = glGetError(); //Ignores one error
-}
-
-void Application::setUpOpenGl() const {
-	checkOpenGlInfo();
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glDepthMask(GL_TRUE);
-	glDepthRange(0.0, 1.0);
-	glClearDepth(1.0);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
-}
-
 void Application::createShaderProgram() const {
 	shader = new Shader("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
 	checkOpenGlError("ERROR: Could not create shaders.");
@@ -210,10 +138,10 @@ void Application::createCubeBuffers() const {
 		-0.5f, 0.0f, 0.0f, 1.0f,
 		0.0f, -0.5f, 0.0f, 1.0f,
 		0.5f, 0.0f, 0.0f, 1.0f,
-		0.0f, 0.5f, 1.0f, 1.0f,
-		-0.5f, 0.0f, 1.0f, 1.0f,
-		0.0f, -0.5f, 1.0f, 1.0f,
-		0.5f, 0.0f, 1.0f, 1.0f
+		0.0f, 0.5f, -1.0f, 1.0f,
+		-0.5f, 0.0f, -1.0f, 1.0f,
+		0.0f, -0.5f, -1.0f, 1.0f,
+		0.5f, 0.0f, -1.0f, 1.0f
 	};
 	const GLubyte indices[] = {
 		0,1,2,	0,2,3, //front
@@ -296,23 +224,97 @@ void Application::createBufferObjects() {
 
 	GLuint shaderID = shader->ID;
 	GLuint viewLoc = shader->getUniform("ViewMatrix");
-	Mat4 m = MatrixFactory::LookAt(Vec3(0, 0, -5), Vec3(0, 0, 0), Vec3(0, 1, 0));
-	std::cout << m << std::endl;
+	//Mat4 m = MatrixFactory::LookAt(Vec3(0, 0, -5), Vec3(0, 0, 0), Vec3(0, 1, 0));
+	//std::cout << m << std::endl;
 	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MatrixFactory::LookAt(Vec3(5, 5, 5), Vec3(0, 0, 0), Vec3(0, 1, 0)).entry);
 
 	GLuint projLoc = shader->getUniform("ProjectionMatrix");
-	m = MatrixFactory::Perspective(PI / 6.f, 640.f / 480.f, 1, 10);
-	std::cout << m << std::endl;
+	/*m = MatrixFactory::Perspective(PI / 6.f, 640.f / 480.f, 1, 10);
+	std::cout << m << std::endl;*/
 	glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Perspective(PI/6.f, 640.f/480.f, 1, 10).entry);
 	//glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Ortho(-2, 2, 2, -2, 1, 10).entry);
 
 	checkOpenGlError("ERROR: Could not create VAOs and VBOs.");
 }
 
+
+// Setups
 void Application::setUpCallBacks() {
 	glutCloseFunc(cleanUp);
 	glutDisplayFunc(display);
 	glutIdleFunc(idle);
 	glutReshapeFunc(reshape);
 	glutTimerFunc(0, timer, 0);
+}
+
+void Application::setUpGlut(int argc, char** argv, const Vec2 win) {
+	glutInit(&argc, argv);
+
+	glutInitContextVersion(3, 3);
+	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
+	glutInitContextProfile(GLUT_CORE_PROFILE);
+
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+
+	glutInitWindowSize(win.x, win.y);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	windowHandle = glutCreateWindow("CGJ Engine");
+	if (windowHandle < 1) {
+		std::cerr << "ERROR: Could not create a new rendering window." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+void Application::setUpGlew() {
+	glewExperimental = GL_TRUE;
+	GLenum result = glewInit();
+	if (result != GLEW_OK) {
+		std::cerr << "ERROR glewInit: " << glewGetString(result) << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	GLenum errCode = glGetError(); //Ignores one error
+}
+
+void Application::setUpOpenGl() const {
+	checkOpenGlInfo();
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glDepthMask(GL_TRUE);
+	glDepthRange(0.0, 1.0);
+	glClearDepth(1.0);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+}
+
+void Application::checkOpenGlError(const std::string error) {
+	if (isOpenGlError()) {
+		std::cerr << error << std::endl;
+		std::cin.get();
+		exit(EXIT_FAILURE);
+	}
+}
+
+void Application::checkOpenGlInfo() {
+	const GLubyte* renderer = glGetString(GL_RENDERER);
+	const GLubyte* vendor = glGetString(GL_VENDOR);
+	const GLubyte* version = glGetString(GL_VERSION);
+	const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+	std::cerr << "OpenGL Renderer: " << renderer << " (" << vendor << ")" << std::endl;
+	std::cerr << "OpenGL version " << version << std::endl;
+	std::cerr << "GLSL version " << glslVersion << std::endl;
+}
+
+bool Application::isOpenGlError() {
+
+	bool isError = false;
+	GLenum errCode;
+	while ((errCode = glGetError()) != GL_NO_ERROR) {
+		isError = true;
+		const GLubyte* errString = gluErrorString(errCode);
+		std::cerr << "OpenGL ERROR [" << errString << "]." << std::endl;
+	}
+	return isError;
+
 }
