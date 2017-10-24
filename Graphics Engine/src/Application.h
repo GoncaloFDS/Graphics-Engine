@@ -6,11 +6,16 @@
 #include <string>
 #include "Shader.h"
 #include "Vec4.h"
+#include "Camera.h"
 
 typedef struct {
 	GLfloat XYZW[4];
 	GLfloat RGBA[4];
 } Vertex;
+
+enum Projection {
+	Ortho, Perspective
+};
 
 class Application {
 public:
@@ -22,7 +27,11 @@ private:
 	static Vec2 win_;
 	static std::string caption;
 	static Shader* shader;
-	static GLuint VAO[3], VBO[3], UBO;
+	static Projection projectionType;
+	static GLuint VAO[3], VBO[3];
+	static Camera camera;
+	static int oldTime;
+	static float deltaTime;
 
 	static bool isOpenGlError();
 	static void checkOpenGlError(std::string error);
@@ -34,6 +43,8 @@ private:
 	static void drawScene();
 	static void display();
 	static void cleanUp();
+	static void keyboardInput(unsigned char key, int x, int y);
+	static void mouseInput(int x, int y);
 
 	void setUpGlut(int argc, char** argv, const Vec2 win);
 	void setUpGlew();
@@ -43,6 +54,7 @@ private:
 	void createTriangleBuffers();
 	void createParallelogramBuffers();
 	void createBufferObjects();
+	static void switchProjection();
 	void setUpCallBacks();
 
 };

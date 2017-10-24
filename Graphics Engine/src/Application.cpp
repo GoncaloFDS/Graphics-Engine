@@ -9,17 +9,19 @@ int Application::windowHandle;
 int Application::frameCount;
 Vec2 Application::win_;
 std::string Application::caption;
-
-GLuint Application::VAO[3];
-GLuint Application::VBO[3];
-GLuint Application::UBO;
+GLuint Application::VAO[3], Application::VBO[3];
 Shader* Application::shader;
+Projection Application::projectionType;
+Camera Application::camera;
+int Application::oldTime;
+float Application::deltaTime;
 
 Application::Application(int argc, char* argv[], const Vec2 win) {
 	win_ = win;
 	windowHandle = 0;
 	frameCount = 0;
 	caption = "CGJ Engine";
+	camera = Camera(Vec3(0, 0, 5));
 
 	setUpGlut(argc, argv, win);
 	setUpGlew();
@@ -27,6 +29,8 @@ Application::Application(int argc, char* argv[], const Vec2 win) {
 	createShaderProgram();
 	createBufferObjects();
 	setUpCallBacks();
+
+	oldTime = glutGet(GLUT_ELAPSED_TIME);
 }
 
 void Application::timer(int value) {
@@ -47,6 +51,9 @@ void Application::reshape(int x, int y) {
 }
 
 void Application::idle() {
+	int t = glutGet(GLUT_ELAPSED_TIME);
+	deltaTime = (t - oldTime) / 1000.0f;
+	oldTime = t;
 	glutPostRedisplay();
 }
 
@@ -115,9 +122,59 @@ void Application::display() {
 void Application::cleanUp() {
 	glDeleteVertexArrays(3, VAO);
 	glDeleteBuffers(3, VBO);
-	glDeleteBuffers(1, &UBO);
 
 	checkOpenGlError("ERROR: Could not destroy VAOs and VBOs.");
+}
+
+void Application::keyboardInput(unsigned char key, int x, int y) {
+	if(key == 'p') {
+		std::cout << "Pressed P" << std::endl;
+		switchProjection();
+	}
+	if(key == 'a') {
+		shader->use();
+		camera.moveCamera(movementDir::Left, deltaTime);
+		GLuint viewLoc = shader->getUniform("ViewMatrix");
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
+	}
+	if(key == 'd') {
+		shader->use();
+		camera.moveCamera(movementDir::Right, deltaTime);
+		GLuint viewLoc = shader->getUniform("ViewMatrix");
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
+	}
+	if(key == 'w') {
+		shader->use();
+		camera.moveCamera(movementDir::Forward, deltaTime);
+		GLuint viewLoc = shader->getUniform("ViewMatrix");
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
+	}
+	if(key == 's') {
+		shader->use();
+		camera.moveCamera(movementDir::Backward, deltaTime);
+		GLuint viewLoc = shader->getUniform("ViewMatrix");
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
+	}
+	if(key == 'e') {
+		shader->use();
+		camera.moveCamera(movementDir::Up, deltaTime);
+		GLuint viewLoc = shader->getUniform("ViewMatrix");
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
+	}
+	if(key == 'q') {
+		shader->use();
+		camera.moveCamera(movementDir::Down, deltaTime);
+		GLuint viewLoc = shader->getUniform("ViewMatrix");
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
+	}
+}
+
+void Application::mouseInput(int x, int y) {
+	shader->use();
+	camera.moveMouse(x, y);
+	GLuint viewLoc = shader->getUniform("ViewMatrix");
+	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
+
 }
 
 void Application::createShaderProgram() const {
@@ -277,18 +334,6 @@ void Application::createParallelogramBuffers() {
 		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 6
 		{ { 0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 5
 
-
-		//{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 0
-		//{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 1
-		//{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 2
-		//{ { -1.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 3
-		//{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 4
-		//{ { 0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 5
-		//{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 6
-		//{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 7
-
-		
-
 	};
 
 	glBindVertexArray(VAO[2]);
@@ -318,15 +363,31 @@ void Application::createBufferObjects() {
 	shader->use();
 
 	GLuint viewLoc = shader->getUniform("ViewMatrix");
-	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MatrixFactory::LookAt(Vec3(5, 5, 5), Vec3(0, 0, 0), Vec3(0, 1, 0)).entry);
+	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 
 	GLuint projLoc = shader->getUniform("ProjectionMatrix");
-	glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Perspective(PI / 6.f, 640.f / 480.f, 1, 10).entry);
+	glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Perspective(PI / 6.f, 640.f / 480.f, 1, 30).entry);
+	projectionType = Projection::Perspective;
 	//glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Ortho(-2, 2, 2, -2, 1, 10).entry);
 
 	checkOpenGlError("ERROR: Could not create VAOs and VBOs.");
 }
 
+void Application::switchProjection() {
+	shader->use();
+
+	GLuint projLoc = shader->getUniform("ProjectionMatrix");
+
+	if (projectionType == Projection::Ortho) {
+		glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Perspective(PI / 6.f, 640.f / 480.f, 1, 30).entry);
+		projectionType = Projection::Perspective;
+	}
+	else if(projectionType == Projection::Perspective) {
+		glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Ortho(-2, 2, 2, -2, 1, 30).entry);
+		projectionType = Projection::Ortho;
+	}
+	
+}
 
 // Setups
 void Application::setUpCallBacks() {
@@ -335,6 +396,8 @@ void Application::setUpCallBacks() {
 	glutIdleFunc(idle);
 	glutReshapeFunc(reshape);
 	glutTimerFunc(0, timer, 0);
+	glutKeyboardFunc(keyboardInput);
+	glutMotionFunc(mouseInput);
 }
 
 void Application::setUpGlut(int argc, char** argv, const Vec2 win) {
