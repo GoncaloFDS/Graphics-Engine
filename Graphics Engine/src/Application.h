@@ -8,7 +8,8 @@
 #include "Vec4.h"
 
 typedef struct {
-	Vec4 xyzw;
+	GLfloat XYZW[4];
+	GLfloat RGBA[4];
 } Vertex;
 
 class Application {
@@ -21,7 +22,7 @@ private:
 	static Vec2 win_;
 	static std::string caption;
 	static Shader* shader;
-	static GLuint VAO[3], VBO[3], EBO[2];
+	static GLuint VAO[3], VBO[3], UBO;
 
 	static bool isOpenGlError();
 	static void checkOpenGlError(std::string error);

@@ -12,7 +12,7 @@ std::string Application::caption;
 
 GLuint Application::VAO[3];
 GLuint Application::VBO[3];
-GLuint Application::EBO[2];
+GLuint Application::UBO;
 Shader* Application::shader;
 
 Application::Application(int argc, char* argv[], const Vec2 win) {
@@ -54,57 +54,50 @@ void Application::drawScene() {
 	glUseProgram(shader->ID);
 
 	GLint matrixUniform = shader->getUniform("ModelMatrix");
-	GLint colorUniform = shader->getUniform("Color");
 	Mat4 worldScale = MatrixFactory::Scale(Vec3(0.5f, 0.5f, 0.5f));
-	Mat4 srt;
 
+
+	
 	glBindVertexArray(VAO[0]);
 
 	//Cube
-	glUniform4fv(colorUniform, 1, Vec4(0, 1, 0, 1).asArray());
-	srt = MatrixFactory::Translate(Vec3(0.75f, 0.15f, 0.0f)) * MatrixFactory::Rotate(PI / 4.f, Vec3(0.0f, 0.0f, 1.0f)) *
+	Mat4 srt = MatrixFactory::Translate(Vec3(0.75f, 0.15f, 0.0f)) * MatrixFactory::Rotate(PI / 4.f, Vec3(0.0f, 0.0f, 1.0f)) *
 		worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	glBindVertexArray(VAO[1]);
 
 	//Triangle small 1
-	glUniform4fv(colorUniform, 1, Vec4(1, 0, 0, 1).asArray());
 	srt = MatrixFactory::Translate(Vec3(0.75f, -0.23f, 0)) * MatrixFactory::Rotate(-PI / 4.f, Vec3(0, 0, 1)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 24);
 	//Triangle small 2
-	glUniform4fv(colorUniform, 1, Vec4(0.66f, 0.31f, 0.76f, 1).asArray());
 	srt = MatrixFactory::Translate(Vec3(-0.05f, -0.62f, 0)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 24);
 	//Triangle medium
-	glUniform4fv(colorUniform, 1, Vec4(1, 0.61f, 0.82f, 1).asArray());
 	srt = MatrixFactory::Translate(Vec3(0.28f, 0.25f, 0)) * MatrixFactory::Rotate(-PI / 4.f, Vec3(0.0f, 0.0f, 1)) *
 		MatrixFactory::Scale(Vec3(1.5f, 1.5f, 1.5f)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0.0f, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 24);
 	//Triangle large 1
-	glUniform4fv(colorUniform, 1, Vec4(0.0f, 0.61f, 1, 1).asArray());
 	srt = MatrixFactory::Translate(Vec3(-0.475f, 0.245f, 0.0f)) * MatrixFactory::Rotate(-3 * PI / 4, Vec3(0, 0.0f, 1)) *
 		MatrixFactory::Scale(Vec3(2, 2, 2)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 24);
 	//Triangle large 2
-	glUniform4fv(colorUniform, 1, Vec4(1, 0.61f, 0, 1).asArray());
 	srt = MatrixFactory::Translate(Vec3(-0.1f, 0.1f, 0.0f)) * MatrixFactory::Rotate(-PI / 2, Vec3(0.0f, 0.0f, 1)) *
 		MatrixFactory::Scale(Vec3(2, 2, 2)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 24);
 
 	glBindVertexArray(VAO[2]);
 
 	//Parallelogram
-	glUniform4fv(colorUniform, 1, Vec4(1, 1, 0, 1).asArray());
 	srt = MatrixFactory::Translate(Vec3(-0.375f, -0.38f, 0.0f)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	glUseProgram(0);
 	glBindVertexArray(0);
@@ -122,34 +115,61 @@ void Application::display() {
 void Application::cleanUp() {
 	glDeleteVertexArrays(3, VAO);
 	glDeleteBuffers(3, VBO);
-	glDeleteBuffers(3, EBO);
+	glDeleteBuffers(1, &UBO);
 
 	checkOpenGlError("ERROR: Could not destroy VAOs and VBOs.");
 }
 
 void Application::createShaderProgram() const {
 	shader = new Shader("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
+
 	checkOpenGlError("ERROR: Could not create shaders.");
 }
 
 void Application::createCubeBuffers() const {
-	const float cubeVertices[]{
-		0.0f, 0.5f, 0.0f, 1.0f,
-		-0.5f, 0.0f, 0.0f, 1.0f,
-		0.0f, -0.5f, 0.0f, 1.0f,
-		0.5f, 0.0f, 0.0f, 1.0f,
-		0.0f, 0.5f, -1.0f, 1.0f,
-		-0.5f, 0.0f, -1.0f, 1.0f,
-		0.0f, -0.5f, -1.0f, 1.0f,
-		0.5f, 0.0f, -1.0f, 1.0f
-	};
-	const GLubyte indices[] = {
-		0,1,2,	0,2,3, //front
-		0,3,7,	0,4,7, //right
-		0,1,5,	0,4,5, //top
-		2,3,7,	2,6,7, //bot
-		1,2,6,	1,5,6, //left
-		4,5,6,	4,6,7 //back
+	const Vertex cubeVertices[]{
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 0 - Front
+		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { 0.0f, -0.5f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 2
+		{ { 0.0f, -0.5f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 2
+		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 3
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 0
+		
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, // 0 - Top Right
+		{ { 0.5f, 0.0f, -1.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, // 7
+		{ { 0.0f, 0.5f, -1.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, // 4
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, // 0
+		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, // 3
+		{ { 0.5f, 0.0f, -1.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, //7
+
+		{ { 0.0f, -0.5f, 0.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, // 2 - Bottom Left
+		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, // 6
+		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, // 3
+		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, //3
+		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, // 6
+		{ { 0.5f, 0.0f, -1.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, // 7
+
+		{ { -0.5f, 0.0f, -1.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 5 - Top Left
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 0
+		{ { 0.0f, 0.5f, -1.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 4
+		{ { -0.5f, 0.0f, -1.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 5
+		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 0
+
+		{ { 0.0f, -0.5f, 0.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 2 - Bottom Left
+		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 6
+		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { -0.5f, 0.0f, -1.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 5
+		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 6
+
+		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 6 - Back
+		{ { -0.5f, 0.0f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 5
+		{ { 0.0f, 0.5f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 4
+		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 6
+		{ { 0.0f, 0.5f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 4
+		{ { 0.5f, 0.0f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 7
+		
 	};
 
 	glBindVertexArray(VAO[0]);
@@ -157,21 +177,46 @@ void Application::createCubeBuffers() const {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0); //Vertices
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glEnableVertexAttribArray(1); //Color
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(cubeVertices[0].XYZW));
 
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-
-	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
 void Application::createTriangleBuffers() {
-	const float triangleVertices[]{
-		0.0f, 0.5f, 0.0f, 1.0f,
-		-0.5f, 0.0f, 0.0f, 1.0f,
-		0.5f, 0.0f, 0.0f, 1.0f
+	const Vertex triangleVertices[]{
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.9f, 0.0f, 1.0f } }, // 0 - Front
+		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.9f, 0.0f, 1.0f } }, // 1
+		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.9f, 0.0f, 1.0f } }, //2
+
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, // 0 - Right
+		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, //2
+		{ { 0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, // 5
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, // 0
+		{ { 0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, // 5
+		{ { 0.0f, 0.5f, -0.5f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, // 3
+
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 0 - Left
+		{ { -0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 4
+		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 1
+		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 0
+		{ { 0.0f, 0.5f, -0.5f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 3
+		{ { -0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 4
+
+		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, // 1
+		{ { -0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, // 4
+		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, //2
+		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, //2
+		{ { -0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, // 4
+		{ { 0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, // 5
+
+		{ { 0.0f, 0.5f, -0.5f, 1.0f },{ 0.4f, 0.5f, 0.0f, 1.0f } }, // 3
+		{ { 0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.5f, 0.0f, 1.0f } }, // 5
+		{ { -0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.5f, 0.0f, 1.0f } }, // 4
+
 	};
 
 	glBindVertexArray(VAO[1]);
@@ -179,33 +224,83 @@ void Application::createTriangleBuffers() {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0); //Vertices
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glEnableVertexAttribArray(1); //Color
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(triangleVertices[0].XYZW));
 
-	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
 void Application::createParallelogramBuffers() {
-	const float parallVertices[]{
-		0.0f, 0.0f, 0.0f, 1.0f,
-		0.5f, 0.5f, 0.0f, 1.0f,
-		-0.5f, 0.5f, 0.0f, 1.0f,
-		-1.0f, 0.0f, 0.0f, 1.0f
+	const Vertex parallVertices[]{
+		{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 0 - Front
+		{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 1
+		{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 2
+		{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 2
+		{ { -1.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 3
+		{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 0
+
+		{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 0 - Right
+		{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 4
+		{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 1
+		{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 4
+		{ { 0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 5
+		{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 1
+
+		{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 1 - Top
+		{ { 0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 5
+		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 6
+		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 6
+		{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 2
+		{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 1
+
+		{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 2 - Left
+		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 6
+		{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 7
+		{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 2
+		{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 7
+		{ { -1.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 3
+
+		{ { -1.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 3
+		{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 7
+		{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 0
+		{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 0
+		{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 7
+		{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 4
+
+		{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 4
+		{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 7
+		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 6
+		{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 4
+		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 6
+		{ { 0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 5
+
+
+		//{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 0
+		//{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 1
+		//{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 2
+		//{ { -1.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 3
+		//{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 4
+		//{ { 0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 5
+		//{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 6
+		//{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 7
+
+		
+
 	};
 
-	const GLubyte indices[] = {0,1,3, 1,2,3};
 	glBindVertexArray(VAO[2]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(parallVertices), parallVertices, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[1]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0); //Vertices
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glEnableVertexAttribArray(1); //Color
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(parallVertices[0].XYZW));
 
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-
-	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
@@ -213,7 +308,7 @@ void Application::createParallelogramBuffers() {
 void Application::createBufferObjects() {
 	glGenVertexArrays(3, VAO);
 	glGenBuffers(3, VBO);
-	glGenBuffers(2, EBO);
+	//glGenBuffers(2, EBO);
 
 	createCubeBuffers();
 	createTriangleBuffers();
@@ -222,16 +317,11 @@ void Application::createBufferObjects() {
 	checkOpenGlError("ERROR: 1.");
 	shader->use();
 
-	GLuint shaderID = shader->ID;
 	GLuint viewLoc = shader->getUniform("ViewMatrix");
-	//Mat4 m = MatrixFactory::LookAt(Vec3(0, 0, -5), Vec3(0, 0, 0), Vec3(0, 1, 0));
-	//std::cout << m << std::endl;
 	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MatrixFactory::LookAt(Vec3(5, 5, 5), Vec3(0, 0, 0), Vec3(0, 1, 0)).entry);
 
 	GLuint projLoc = shader->getUniform("ProjectionMatrix");
-	/*m = MatrixFactory::Perspective(PI / 6.f, 640.f / 480.f, 1, 10);
-	std::cout << m << std::endl;*/
-	glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Perspective(PI/6.f, 640.f/480.f, 1, 10).entry);
+	glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Perspective(PI / 6.f, 640.f / 480.f, 1, 10).entry);
 	//glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Ortho(-2, 2, 2, -2, 1, 10).entry);
 
 	checkOpenGlError("ERROR: Could not create VAOs and VBOs.");
