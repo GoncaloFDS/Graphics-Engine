@@ -32,6 +32,7 @@ private:
 	static Camera camera;
 	static int oldTime;
 	static float deltaTime;
+	static bool movementKeyPressed[6];
 
 	static bool isOpenGlError();
 	static void checkOpenGlError(std::string error);
@@ -55,6 +56,8 @@ private:
 	void createParallelogramBuffers();
 	void createBufferObjects();
 	static void switchProjection();
+	static void keyUpFunc(unsigned char key, int x, int y);
+	static void processMovement(int x);
 	void setUpCallBacks();
 
 };

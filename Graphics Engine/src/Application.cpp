@@ -15,6 +15,7 @@ Projection Application::projectionType;
 Camera Application::camera;
 int Application::oldTime;
 float Application::deltaTime;
+bool Application::movementKeyPressed[6];
 
 Application::Application(int argc, char* argv[], const Vec2 win) {
 	win_ = win;
@@ -54,6 +55,7 @@ void Application::idle() {
 	int t = glutGet(GLUT_ELAPSED_TIME);
 	deltaTime = (t - oldTime) / 1000.0f;
 	oldTime = t;
+	processMovement(0);
 	glutPostRedisplay();
 }
 
@@ -132,41 +134,80 @@ void Application::keyboardInput(unsigned char key, int x, int y) {
 		switchProjection();
 	}
 	if(key == 'a') {
-		shader->use();
+		movementKeyPressed[0] = true;
+	}
+	if(key == 'd') {
+		movementKeyPressed[1] = true;
+	}
+	if(key == 'w') {
+		movementKeyPressed[2] = true;
+	}
+	if(key == 's') {
+		movementKeyPressed[3] = true;
+	}
+	if(key == 'e') {
+		movementKeyPressed[4] = true;
+	}
+	if(key == 'q') {
+		movementKeyPressed[5] = true;
+	}
+}
+
+void Application::keyUpFunc(unsigned char key, int x, int y) {
+	if (key == 'a') {
+		movementKeyPressed[0] = false;
+	}
+	if (key == 'd') {
+		movementKeyPressed[1] = false;
+	}
+	if (key == 'w') {
+		movementKeyPressed[2] = false;
+	}
+	if (key == 's') {
+		movementKeyPressed[3] = false;
+	}
+	if (key == 'e') {
+		movementKeyPressed[4] = false;
+	}
+	if (key == 'q') {
+		movementKeyPressed[5] = false;
+	}
+}
+
+void Application::processMovement(int x) {
+	shader->use();
+	if(movementKeyPressed[0]) {
 		camera.moveCamera(movementDir::Left, deltaTime);
 		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
-	if(key == 'd') {
-		shader->use();
+	if(movementKeyPressed[1]) {
 		camera.moveCamera(movementDir::Right, deltaTime);
 		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
-	if(key == 'w') {
-		shader->use();
+	if(movementKeyPressed[2]) {
 		camera.moveCamera(movementDir::Forward, deltaTime);
 		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
-	if(key == 's') {
-		shader->use();
+	if(movementKeyPressed[3]) {
 		camera.moveCamera(movementDir::Backward, deltaTime);
 		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
-	if(key == 'e') {
-		shader->use();
+	if(movementKeyPressed[4]) {
 		camera.moveCamera(movementDir::Up, deltaTime);
 		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
-	if(key == 'q') {
-		shader->use();
+	if(movementKeyPressed[5]) {
 		camera.moveCamera(movementDir::Down, deltaTime);
 		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
+
+
 }
 
 void Application::mouseInput(int x, int y) {
@@ -397,6 +438,7 @@ void Application::setUpCallBacks() {
 	glutReshapeFunc(reshape);
 	glutTimerFunc(0, timer, 0);
 	glutKeyboardFunc(keyboardInput);
+	glutKeyboardUpFunc(keyUpFunc);
 	glutMotionFunc(mouseInput);
 }
 
@@ -416,6 +458,8 @@ void Application::setUpGlut(int argc, char** argv, const Vec2 win) {
 		std::cerr << "ERROR: Could not create a new rendering window." << std::endl;
 		exit(EXIT_FAILURE);
 	}
+
+	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 }
 
 void Application::setUpGlew() {

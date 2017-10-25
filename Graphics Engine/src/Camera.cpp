@@ -12,7 +12,7 @@ Camera::Camera(Vec3 pos) {
 	right = Vec3(1, 0, 0);
 	front = Vec3(0, 0, 0) - position;
 	worldUp = Vec3(0, 1, 0);
-	movementSpeed = 20.f;
+	movementSpeed = 3.f;
 	mouseSensivity = .00001f;
 	yaw = 0;
 	pitch = 0;
@@ -21,7 +21,7 @@ Camera::Camera(Vec3 pos) {
 
 
 void Camera::moveCamera(movementDir dir, float deltaTime) {
-	float velocity = movementSpeed * deltaTime;
+	const float velocity = movementSpeed * deltaTime;
 	if (dir == Forward)
 		position += front * velocity;
 	if (dir == Backward)
