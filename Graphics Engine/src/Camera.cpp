@@ -2,33 +2,23 @@
 #include "MatrixFactory.h"
 #include <GL/glew.h>
 #include "Application.h"
-#include <valarray>
 
-float radians(float degrees) {
+float radians(const float degrees) {
 	return degrees * PI / 180;
 }
 
-Camera::Camera(Vec3 pos) {
+Camera::Camera(const Vec3 pos, const Vec3 center) {
 	position = pos;
-	front = Vec3(0, 0, 0) - position;
-	frontDist = front.Magnitude();
+	front = center - position;
 	worldUp = Vec3(0, 1, 0);
 	right = front.Cross(worldUp);
 	up = right.Cross(front);
 	front.Normalize();
 	right.Normalize();
 	up.Normalize();
-	
-	yaw = -acos((Vec3(front.x, 0, front.z).Normalize()).Dot(Vec3(0, 0, -1))) *180.0f / PI;
-	pitch = -acos((Vec3(0, front.y, front.z).Normalize()).Dot(Vec3(0, 0, -1))) *180.0f / PI;
-	movementSpeed = 3.f;
-	mouseSensivity = 0.1f;
 
-	/*std::cout << front << std::endl;
-	std::cout << "yaw :: " << yaw << std::endl;
-	std::cout << "pitch ::" << pitch << std::endl;
-	std::cout << "position ::" << position << std::endl;
-*/
+	movementSpeed = 3.f;
+	mouseSensivity = 0.002f;
 }
 
 
@@ -40,7 +30,7 @@ void Camera::setIsFirstMouseInput(bool b) {
 	firstMouseInput = b;
 }
 
-void Camera::moveCamera(movementDir dir, float deltaTime) {
+void Camera::moveCamera(const movementDir dir, const float deltaTime) {
 	const float velocity = movementSpeed * deltaTime;
 	if (dir == Forward)
 		position += front * velocity;
@@ -57,13 +47,6 @@ void Camera::moveCamera(movementDir dir, float deltaTime) {
 }
 
 void Camera::updateVectors() {
-	front.x = sin(radians(yaw)) * cos(radians(pitch));
-	front.y = sin(radians(pitch));
-	front.z = -cos(radians(pitch)) * cos(radians(yaw));
-	/*std::cout << front << std::endl;
-	std::cout << "yaw :: " << yaw << std::endl;
-	std::cout << "pitch ::" << pitch << std::endl;
-	std::cout << "position ::" << position << std::endl;*/
 	right = front.Cross(worldUp);
 	up = right.Cross(front);
 	front.Normalize();
@@ -80,26 +63,22 @@ void Camera::moveMouse(int x, int y, Vec2 screen) {
 			firstMouseInput = false;
 		}
 
-		Vec2 offset(x - lastMouse.x, lastMouse.y - y);
+		Vec2 offset(lastMouse.x - x, lastMouse.y - y);
 		lastMouse.x = x;
 		lastMouse.y = y;
 
 		offset.x *= mouseSensivity;
 		offset.y *= mouseSensivity;
 
-		yaw += offset.x;
-		pitch += offset.y;
-
-		if (pitch > 89.0f)
-			pitch = 89.0f;
-		if (pitch < -89.0f)
-			pitch = -89.0f;
+		Mat4 rotator = MatrixFactory::Rotate(offset.x, up) * 
+			MatrixFactory::Rotate(offset.y, right);
+		front = Mat3(rotator) * front;
 
 		updateVectors();
 	}
 }
 
-Mat4 Camera::getViewMatrix() {
+Mat4 Camera::getViewMatrix() const {
 	return MatrixFactory::LookAt(position, position + front, up);
 }
 

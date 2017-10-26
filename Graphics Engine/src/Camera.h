@@ -33,7 +33,7 @@ private:
 
 public:
 	Camera() = default;
-	Camera(Vec3 pos);
+	Camera(Vec3 pos, Vec3 center);
 	~Camera() = default;
 	Vec3 position;
 
@@ -43,7 +43,7 @@ public:
 	void moveCamera(movementDir dir, float deltaTime);
 	void updateVectors();
 	void moveMouse(int x, int y, Vec2 screen);
-	Mat4 getViewMatrix();
+	Mat4 getViewMatrix() const;
 
 };
 

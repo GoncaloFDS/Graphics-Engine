@@ -22,7 +22,7 @@ Application::Application(int argc, char* argv[], const Vec2 win) {
 	windowHandle = 0;
 	frameCount = 0;
 	caption = "CGJ Engine";
-	camera = Camera(Vec3(5 ,0, 5));
+	camera = Camera(Vec3(5 , 5, 5), Vec3(0, 0, 0));
 
 	setUpGlut(argc, argv, win);
 	setUpGlew();
@@ -181,7 +181,6 @@ void Application::cleanUp() {
 
 void Application::keyboardInput(unsigned char key, int x, int y) {
 	if(key == 'p') {
-		std::cout << "Pressed P" << std::endl;
 		switchProjection();
 	}
 	if(key == 'a') {
@@ -227,37 +226,31 @@ void Application::keyUpFunc(unsigned char key, int x, int y) {
 
 void Application::processMovement(int x) {
 	shader->use();
+	GLuint viewLoc = shader->getUniform("ViewMatrix");
 	if(movementKeyPressed[0]) {
 		camera.moveCamera(movementDir::Left, deltaTime);
-		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
 	if(movementKeyPressed[1]) {
 		camera.moveCamera(movementDir::Right, deltaTime);
-		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
 	if(movementKeyPressed[2]) {
 		camera.moveCamera(movementDir::Forward, deltaTime);
-		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
 	if(movementKeyPressed[3]) {
 		camera.moveCamera(movementDir::Backward, deltaTime);
-		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
 	if(movementKeyPressed[4]) {
 		camera.moveCamera(movementDir::Up, deltaTime);
-		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
 	if(movementKeyPressed[5]) {
 		camera.moveCamera(movementDir::Down, deltaTime);
-		GLuint viewLoc = shader->getUniform("ViewMatrix");
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 	}
-
 
 }
 
