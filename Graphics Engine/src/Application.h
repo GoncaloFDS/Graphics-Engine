@@ -45,7 +45,8 @@ private:
 	static void display();
 	static void cleanUp();
 	static void keyboardInput(unsigned char key, int x, int y);
-	static void mouseInput(int x, int y);
+	static void mouseMoveInput(int x, int y);
+	static void mouseButtonInput(int button, int state, int x, int y);
 
 	void setUpGlut(int argc, char** argv, const Vec2 win);
 	void setUpGlew();

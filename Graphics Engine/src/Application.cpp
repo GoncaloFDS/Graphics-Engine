@@ -210,12 +210,22 @@ void Application::processMovement(int x) {
 
 }
 
-void Application::mouseInput(int x, int y) {
+void Application::mouseMoveInput(int x, int y) {
 	shader->use();
-	camera.moveMouse(x, y);
+	camera.moveMouse(x, y, win_);
 	GLuint viewLoc = shader->getUniform("ViewMatrix");
 	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 
+}
+
+void Application::mouseButtonInput(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		camera.setLeftButton(true);
+		camera.setIsFirstMouseInput(true);
+	}
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) 
+		camera.setLeftButton(false);
+		
 }
 
 void Application::createShaderProgram() const {
@@ -416,7 +426,6 @@ void Application::createBufferObjects() {
 
 void Application::switchProjection() {
 	shader->use();
-
 	GLuint projLoc = shader->getUniform("ProjectionMatrix");
 
 	if (projectionType == Projection::Ortho) {
@@ -439,7 +448,8 @@ void Application::setUpCallBacks() {
 	glutTimerFunc(0, timer, 0);
 	glutKeyboardFunc(keyboardInput);
 	glutKeyboardUpFunc(keyUpFunc);
-	glutMotionFunc(mouseInput);
+	glutMotionFunc(mouseMoveInput);
+	glutMouseFunc(mouseButtonInput);
 }
 
 void Application::setUpGlut(int argc, char** argv, const Vec2 win) {

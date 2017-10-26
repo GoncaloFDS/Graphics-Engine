@@ -18,6 +18,7 @@ class Camera {
 private:
 	Vec3 front;
 	Vec3 right;
+	Vec3 up;
 	Vec3 worldUp;
 
 	float movementSpeed;
@@ -25,6 +26,9 @@ private:
 
 	float yaw;
 	float pitch;
+	Vec2 lastMouse;
+	bool leftButtonPressed = false;
+	bool firstMouseInput = true;
 
 public:
 	Camera() = default;
@@ -32,9 +36,12 @@ public:
 	~Camera() = default;
 	Vec3 position;
 
+	void setLeftButton(bool b);
+	void setIsFirstMouseInput(bool b);
+
 	void moveCamera(movementDir dir, float deltaTime);
 	void updateVectors();
-	void moveMouse(int xOffset, int yOffset);
+	void moveMouse(int x, int y, Vec2 screen);
 	Mat4 getViewMatrix();
 
 };
