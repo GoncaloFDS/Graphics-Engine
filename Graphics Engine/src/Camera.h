@@ -29,6 +29,7 @@ private:
 	Vec2 lastMouse;
 	bool leftButtonPressed = false;
 	bool firstMouseInput = true;
+	float frontDist;
 
 public:
 	Camera() = default;

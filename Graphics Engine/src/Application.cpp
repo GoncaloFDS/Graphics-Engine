@@ -22,7 +22,7 @@ Application::Application(int argc, char* argv[], const Vec2 win) {
 	windowHandle = 0;
 	frameCount = 0;
 	caption = "CGJ Engine";
-	camera = Camera(Vec3(0, 0, 5));
+	camera = Camera(Vec3(5 ,0, 5));
 
 	setUpGlut(argc, argv, win);
 	setUpGlew();
@@ -64,7 +64,7 @@ void Application::drawScene() {
 
 	GLint matrixUniform = shader->getUniform("ModelMatrix");
 	Mat4 worldScale = MatrixFactory::Scale(Vec3(0.5f, 0.5f, 0.5f));
-
+	GLint ColorUniform = shader->getUniform("Color");
 
 	
 	glBindVertexArray(VAO[0]);
@@ -73,40 +73,91 @@ void Application::drawScene() {
 	Mat4 srt = MatrixFactory::Translate(Vec3(0.75f, 0.15f, 0.0f)) * MatrixFactory::Rotate(PI / 4.f, Vec3(0.0f, 0.0f, 1.0f)) *
 		worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-
+	for(int i = 0; i < 6; i++) {
+		glUniform4fv(ColorUniform, 1, Vec4(1-i*0.1, 0, 0, 1).asArray());
+		glDrawArrays(GL_TRIANGLES, i*6, 6);
+	}
+	
 	glBindVertexArray(VAO[1]);
 
 	//Triangle small 1
 	srt = MatrixFactory::Translate(Vec3(0.75f, -0.23f, 0)) * MatrixFactory::Rotate(-PI / 4.f, Vec3(0, 0, 1)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 24);
+	glUniform4fv(ColorUniform, 1, Vec4(1, 1, 0, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glUniform4fv(ColorUniform, 1, Vec4(1, .9, 0, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 3, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(1, .8, 0, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 9, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(1, .7, 0, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 15, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(1, .6, 0, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 21, 3);
 	//Triangle small 2
-	srt = MatrixFactory::Translate(Vec3(-0.05f, -0.62f, 0)) * worldScale;
+	srt = MatrixFactory::Translate(Vec3(-0.05f, -0.62f, 0)) * MatrixFactory::Scale(Vec3(1, 1, 1.7))* worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 24);
+	glUniform4fv(ColorUniform, 1, Vec4(0, 1, 1, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glUniform4fv(ColorUniform, 1, Vec4(0, 1, .9, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 3, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0, 1, .8, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 9, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0, 1, .7, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 15, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0, 1, .6, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 21, 3);
 	//Triangle medium
 	srt = MatrixFactory::Translate(Vec3(0.28f, 0.25f, 0)) * MatrixFactory::Rotate(-PI / 4.f, Vec3(0.0f, 0.0f, 1)) *
 		MatrixFactory::Scale(Vec3(1.5f, 1.5f, 1.5f)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 24);
+	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, 1, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, .9, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 3, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, .8, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 9, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, .7, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 15, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, .6, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 21, 3);
 	//Triangle large 1
 	srt = MatrixFactory::Translate(Vec3(-0.475f, 0.245f, 0.0f)) * MatrixFactory::Rotate(-3 * PI / 4, Vec3(0, 0.0f, 1)) *
 		MatrixFactory::Scale(Vec3(2, 2, 2)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 24);
+	glUniform4fv(ColorUniform, 1, Vec4(0.1, .2, 1, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glUniform4fv(ColorUniform, 1, Vec4(0.1, .2, .9, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 3, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0.1, .2, .8, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 9, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0.1, .2, .7, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 15, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0.1, .2, .6, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 21, 3);
 	//Triangle large 2
 	srt = MatrixFactory::Translate(Vec3(-0.1f, 0.1f, 0.0f)) * MatrixFactory::Rotate(-PI / 2, Vec3(0.0f, 0.0f, 1)) *
-		MatrixFactory::Scale(Vec3(2, 2, 2)) * worldScale;
+		MatrixFactory::Scale(Vec3(2, 2, 2))  * MatrixFactory::Scale(Vec3(1, 1, 1.3)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 24);
+	glUniform4fv(ColorUniform, 1, Vec4(0.9, .2, .2, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glUniform4fv(ColorUniform, 1, Vec4(0.8, .2, .2, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 3, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, .2, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 9, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0.6, .2, .2, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 15, 6);
+	glUniform4fv(ColorUniform, 1, Vec4(0.5, .2, .2, 1).asArray());
+	glDrawArrays(GL_TRIANGLES, 21, 3);
 
 	glBindVertexArray(VAO[2]);
 
 	//Parallelogram
-	srt = MatrixFactory::Translate(Vec3(-0.375f, -0.38f, 0.0f)) * worldScale;
+	srt = MatrixFactory::Translate(Vec3(-0.375f, -0.38f, 0.0f))* worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	for (int i = 0; i < 6; i++) {
+		glUniform4fv(ColorUniform, 1, Vec4(0.4, 1 - i*0.1, 0, 1).asArray());
+		glDrawArrays(GL_TRIANGLES, i * 6, 6);
+	}
 
 	glUseProgram(0);
 	glBindVertexArray(0);
@@ -236,47 +287,47 @@ void Application::createShaderProgram() const {
 
 void Application::createCubeBuffers() const {
 	const Vertex cubeVertices[]{
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 0 - Front
-		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { 0.0f, -0.5f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 2
-		{ { 0.0f, -0.5f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 2
-		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 3
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.9f, 0.0f, 0.0f, 1.0f } }, // 0
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0 - Front
+		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { 0.0f, -0.5f, 0.0f, 1.0f } }, // 2
+		{ { 0.0f, -0.5f, 0.0f, 1.0f } }, // 2
+		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, // 3
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
 		
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, // 0 - Top Right
-		{ { 0.5f, 0.0f, -1.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, // 7
-		{ { 0.0f, 0.5f, -1.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, // 4
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, // 0
-		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, // 3
-		{ { 0.5f, 0.0f, -1.0f, 1.0f },{ 0.8f, 0.0f, 0.0f, 1.0f } }, //7
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0 - Top Right
+		{ { 0.5f, 0.0f, -1.0f, 1.0f } }, // 7
+		{ { 0.0f, 0.5f, -1.0f, 1.0f } }, // 4
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
+		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, // 3
+		{ { 0.5f, 0.0f, -1.0f, 1.0f } }, //7
 
-		{ { 0.0f, -0.5f, 0.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, // 2 - Bottom Left
-		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, // 6
-		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, // 3
-		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, //3
-		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, // 6
-		{ { 0.5f, 0.0f, -1.0f, 1.0f },{ 0.7f, 0.0f, 0.0f, 1.0f } }, // 7
+		{ { 0.0f, -0.5f, 0.0f, 1.0f } }, // 2 - Bottom Left
+		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6
+		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, // 3
+		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, //3
+		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6
+		{ { 0.5f, 0.0f, -1.0f, 1.0f } }, // 7
 
-		{ { -0.5f, 0.0f, -1.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 5 - Top Left
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 0
-		{ { 0.0f, 0.5f, -1.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 4
-		{ { -0.5f, 0.0f, -1.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 5
-		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.6f, 0.0f, 0.0f, 1.0f } }, // 0
+		{ { -0.5f, 0.0f, -1.0f, 1.0f } }, // 5 - Top Left
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
+		{ { 0.0f, 0.5f, -1.0f, 1.0f } }, // 4
+		{ { -0.5f, 0.0f, -1.0f, 1.0f } }, // 5
+		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
 
-		{ { 0.0f, -0.5f, 0.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 2 - Bottom Left
-		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 6
-		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { -0.5f, 0.0f, -1.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 5
-		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.5f, 0.0f, 0.0f, 1.0f } }, // 6
+		{ { 0.0f, -0.5f, 0.0f, 1.0f } }, // 2 - Bottom Left
+		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6
+		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { -0.5f, 0.0f, -1.0f, 1.0f } }, // 5
+		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6
 
-		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 6 - Back
-		{ { -0.5f, 0.0f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 5
-		{ { 0.0f, 0.5f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 4
-		{ { 0.0f, -0.5f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 6
-		{ { 0.0f, 0.5f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 4
-		{ { 0.5f, 0.0f, -1.0f, 1.0f },{ 0.4f, 0.0f, 0.0f, 1.0f } }, // 7
+		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6 - Back
+		{ { -0.5f, 0.0f, -1.0f, 1.0f } }, // 5
+		{ { 0.0f, 0.5f, -1.0f, 1.0f } }, // 4
+		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6
+		{ { 0.0f, 0.5f, -1.0f, 1.0f } }, // 4
+		{ { 0.5f, 0.0f, -1.0f, 1.0f } }, // 7
 		
 	};
 
@@ -287,8 +338,6 @@ void Application::createCubeBuffers() const {
 
 	glEnableVertexAttribArray(0); //Vertices
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	glEnableVertexAttribArray(1); //Color
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(cubeVertices[0].XYZW));
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -296,34 +345,34 @@ void Application::createCubeBuffers() const {
 
 void Application::createTriangleBuffers() {
 	const Vertex triangleVertices[]{
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.9f, 0.0f, 1.0f } }, // 0 - Front
-		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.9f, 0.0f, 1.0f } }, // 1
-		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.9f, 0.0f, 1.0f } }, //2
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0 - Front
+		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, //2
 
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, // 0 - Right
-		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, //2
-		{ { 0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, // 5
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, // 0
-		{ { 0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, // 5
-		{ { 0.0f, 0.5f, -0.5f, 1.0f },{ 0.4f, 0.8f, 0.0f, 1.0f } }, // 3
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0 - Right
+		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, //2
+		{ { 0.5f, 0.0f, -0.5f, 1.0f } }, // 5
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
+		{ { 0.5f, 0.0f, -0.5f, 1.0f } }, // 5
+		{ { 0.0f, 0.5f, -0.5f, 1.0f } }, // 3
 
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 0 - Left
-		{ { -0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 4
-		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 1
-		{ { 0.0f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 0
-		{ { 0.0f, 0.5f, -0.5f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 3
-		{ { -0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.7f, 0.0f, 1.0f } }, // 4
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0 - Left
+		{ { -0.5f, 0.0f, -0.5f, 1.0f } }, // 4
+		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
+		{ { 0.0f, 0.5f, -0.5f, 1.0f } }, // 3
+		{ { -0.5f, 0.0f, -0.5f, 1.0f } }, // 4
 
-		{ { -0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, // 1
-		{ { -0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, // 4
-		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, //2
-		{ { 0.5f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, //2
-		{ { -0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, // 4
-		{ { 0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.6f, 0.0f, 1.0f } }, // 5
+		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
+		{ { -0.5f, 0.0f, -0.5f, 1.0f } }, // 4
+		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, //2
+		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, //2
+		{ { -0.5f, 0.0f, -0.5f, 1.0f } }, // 4
+		{ { 0.5f, 0.0f, -0.5f, 1.0f } }, // 5
 
-		{ { 0.0f, 0.5f, -0.5f, 1.0f },{ 0.4f, 0.5f, 0.0f, 1.0f } }, // 3
-		{ { 0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.5f, 0.0f, 1.0f } }, // 5
-		{ { -0.5f, 0.0f, -0.5f, 1.0f },{ 0.4f, 0.5f, 0.0f, 1.0f } }, // 4
+		{ { 0.0f, 0.5f, -0.5f, 1.0f } }, // 3
+		{ { 0.5f, 0.0f, -0.5f, 1.0f } }, // 5
+		{ { -0.5f, 0.0f, -0.5f, 1.0f } }, // 4
 
 	};
 
@@ -334,56 +383,54 @@ void Application::createTriangleBuffers() {
 
 	glEnableVertexAttribArray(0); //Vertices
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	glEnableVertexAttribArray(1); //Color
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(triangleVertices[0].XYZW));
-
+	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
 void Application::createParallelogramBuffers() {
 	const Vertex parallVertices[]{
-		{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 0 - Front
-		{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 1
-		{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 2
-		{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 2
-		{ { -1.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 3
-		{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.9f, 1.0f } }, // 0
+		{ { 0.0f, 0.0f, 0.0f, 1.0f }}, // 0 - Front
+		{ { 0.5f, 0.5f, 0.0f, 1.0f }}, // 1
+		{ { -0.5f, 0.5f, 0.0f, 1.0f }}, // 2
+		{ { -0.5f, 0.5f, 0.0f, 1.0f }}, // 2
+		{ { -1.0f, 0.0f, 0.0f, 1.0f }}, // 3
+		{ { 0.0f, 0.0f, 0.0f, 1.0f }}, // 0
 
-		{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 0 - Right
-		{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 4
-		{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 1
-		{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 4
-		{ { 0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 5
-		{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.8f, 1.0f } }, // 1
+		{ { 0.0f, 0.0f, 0.0f, 1.0f }}, // 0 - Right
+		{ { 0.0f, 0.0f, -1.2f, 1.0f }}, // 4
+		{ { 0.5f, 0.5f, 0.0f, 1.0f }}, // 1
+		{ { 0.0f, 0.0f, -1.2f, 1.0f }}, // 4
+		{ { 0.5f, 0.5f, -1.2f, 1.0f } }, // 5
+		{ { 0.5f, 0.5f, 0.0f, 1.0f } }, // 1
 
-		{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 1 - Top
-		{ { 0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 5
-		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 6
-		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 6
-		{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 2
-		{ { 0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.7f, 1.0f } }, // 1
+		{ { 0.5f, 0.5f, 0.0f, 1.0f }}, // 1 - Top
+		{ { 0.5f, 0.5f, -1.2f, 1.0f }}, // 5
+		{ { -0.5f, 0.5f, -1.2f, 1.0f }}, // 6
+		{ { -0.5f, 0.5f, -1.2f, 1.0f } }, // 6
+		{ { -0.5f, 0.5f, 0.0f, 1.0f }}, // 2
+		{ { 0.5f, 0.5f, 0.0f, 1.0f }}, // 1
 
-		{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 2 - Left
-		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 6
-		{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 7
-		{ { -0.5f, 0.5f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 2
-		{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 7
-		{ { -1.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.6f, 1.0f } }, // 3
+		{ { -0.5f, 0.5f, 0.0f, 1.0f } }, // 2 - Left
+		{ { -0.5f, 0.5f, -1.2f, 1.0f } }, // 6
+		{ { -1.0f, 0.0f, -1.2f, 1.0f } }, // 7
+		{ { -0.5f, 0.5f, 0.0f, 1.0f }}, // 2
+		{ { -1.0f, 0.0f, -1.2f, 1.0f } }, // 7
+		{ { -1.0f, 0.0f, 0.0f, 1.0f } }, // 3
 
-		{ { -1.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 3
-		{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 7
-		{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 0
-		{ { 0.0f, 0.0f, 0.0f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 0
-		{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 7
-		{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.5f, 1.0f } }, // 4
+		{ { -1.0f, 0.0f, 0.0f, 1.0f } }, // 3
+		{ { -1.0f, 0.0f, -1.2f, 1.0f } }, // 7
+		{ { 0.0f, 0.0f, 0.0f, 1.0f } }, // 0
+		{ { 0.0f, 0.0f, 0.0f, 1.0f } }, // 0
+		{ { -1.0f, 0.0f, -1.2f, 1.0f } }, // 7
+		{ { 0.0f, 0.0f, -1.2f, 1.0f } }, // 4
 
-		{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 4
-		{ { -1.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 7
-		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 6
-		{ { 0.0f, 0.0f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 4
-		{ { -0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 6
-		{ { 0.5f, 0.5f, -1.2f, 1.0f },{ 0.4f, 0.5f, 0.4f, 1.0f } }, // 5
+		{ { 0.0f, 0.0f, -1.2f, 1.0f } }, // 4
+		{ { -1.0f, 0.0f, -1.2f, 1.0f } }, // 7
+		{ { -0.5f, 0.5f, -1.2f, 1.0f } }, // 6
+		{ { 0.0f, 0.0f, -1.2f, 1.0f } }, // 4
+		{ { -0.5f, 0.5f, -1.2f, 1.0f } }, // 6
+		{ { 0.5f, 0.5f, -1.2f, 1.0f } }, // 5
 
 	};
 
@@ -394,8 +441,6 @@ void Application::createParallelogramBuffers() {
 
 	glEnableVertexAttribArray(0); //Vertices
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	glEnableVertexAttribArray(1); //Color
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(parallVertices[0].XYZW));
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -404,7 +449,6 @@ void Application::createParallelogramBuffers() {
 void Application::createBufferObjects() {
 	glGenVertexArrays(3, VAO);
 	glGenBuffers(3, VBO);
-	//glGenBuffers(2, EBO);
 
 	createCubeBuffers();
 	createTriangleBuffers();

@@ -19,8 +19,8 @@ int main(int argc, char* argv[]) {
 
 		exit(EXIT_SUCCESS);
 	}
-	catch (...) {
-		std::cerr << "Exception on main" << std::endl;
+	catch (std::exception &e) {
+		std::cerr << "Caught Exception:" << e.what() << std::endl;
 		std::cin.get();
 	}
 

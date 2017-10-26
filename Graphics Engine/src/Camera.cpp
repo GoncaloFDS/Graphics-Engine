@@ -2,6 +2,7 @@
 #include "MatrixFactory.h"
 #include <GL/glew.h>
 #include "Application.h"
+#include <valarray>
 
 float radians(float degrees) {
 	return degrees * PI / 180;
@@ -9,15 +10,25 @@ float radians(float degrees) {
 
 Camera::Camera(Vec3 pos) {
 	position = pos;
-	right = Vec3(1, 0, 0);
 	front = Vec3(0, 0, 0) - position;
-	front.Normalize();
+	frontDist = front.Magnitude();
 	worldUp = Vec3(0, 1, 0);
+	right = front.Cross(worldUp);
+	up = right.Cross(front);
+	front.Normalize();
+	right.Normalize();
+	up.Normalize();
+	
+	yaw = -acos((Vec3(front.x, 0, front.z).Normalize()).Dot(Vec3(0, 0, -1))) *180.0f / PI;
+	pitch = -acos((Vec3(0, front.y, front.z).Normalize()).Dot(Vec3(0, 0, -1))) *180.0f / PI;
 	movementSpeed = 3.f;
 	mouseSensivity = 0.1f;
-	yaw = 0;
-	pitch = 0;
-	
+
+	/*std::cout << front << std::endl;
+	std::cout << "yaw :: " << yaw << std::endl;
+	std::cout << "pitch ::" << pitch << std::endl;
+	std::cout << "position ::" << position << std::endl;
+*/
 }
 
 
@@ -49,6 +60,10 @@ void Camera::updateVectors() {
 	front.x = sin(radians(yaw)) * cos(radians(pitch));
 	front.y = sin(radians(pitch));
 	front.z = -cos(radians(pitch)) * cos(radians(yaw));
+	/*std::cout << front << std::endl;
+	std::cout << "yaw :: " << yaw << std::endl;
+	std::cout << "pitch ::" << pitch << std::endl;
+	std::cout << "position ::" << position << std::endl;*/
 	right = front.Cross(worldUp);
 	up = right.Cross(front);
 	front.Normalize();
@@ -85,7 +100,7 @@ void Camera::moveMouse(int x, int y, Vec2 screen) {
 }
 
 Mat4 Camera::getViewMatrix() {
-	return MatrixFactory::LookAt(position, position + front, Vec3(0, 1, 0));
+	return MatrixFactory::LookAt(position, position + front, up);
 }
 
 
