@@ -76,11 +76,6 @@ void Camera::moveMouse(int x, int y, Vec2 screen) {
 		up = Mat3(rotator) * up;
 		up.x = 0;
 		right = front.Cross(up);
-
-		std::cout << "front " << front << std::endl;
-		std::cout << "right " << right << std::endl;
-		std::cout << "up " << up << std::endl;
-
 		updateVectors();
 	}
 }

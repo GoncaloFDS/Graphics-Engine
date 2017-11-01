@@ -29,6 +29,7 @@ struct Vec4 {
 	Vec4& operator/=(const float& scalar);
 
 	float Dot(const Vec4& other) const;
+	void Normalize();
 
 	friend std::ostream& operator<<(std::ostream& stream, const Vec4& vector);
 

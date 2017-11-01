@@ -69,6 +69,14 @@ float Vec4::Dot(const Vec4& other) const {
 	return x * other.x + y * other.y + z * other.z + w * other.w;
 }
 
+void Vec4::Normalize() {
+	float s = 1 / (w * sqrt(x*x + y*y + z*z));
+	x *= s;
+	y *= s;
+	z *= s;
+	w = 1.0f;
+}
+
 std::ostream& operator<<(std::ostream& stream, const Vec4& vector) {
 	stream << "(" << vector.x << ", " << vector.y << ", " << vector.z << ", " << vector.w << ")";
 	return stream;

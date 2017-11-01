@@ -118,6 +118,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Quat.cpp" />
     <ClCompile Include="src\Mat2.cpp" />
     <ClCompile Include="src\Mat3.cpp" />
     <ClCompile Include="src\Mat4.cpp" />
@@ -126,6 +127,7 @@
     <ClCompile Include="src\Vec4.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Quat.h" />
     <ClInclude Include="src\Mat2.h" />
     <ClInclude Include="src\Mat3.h" />
     <ClInclude Include="src\Mat4.h" />
