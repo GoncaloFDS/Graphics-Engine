@@ -22,7 +22,7 @@ Application::Application(int argc, char* argv[], const Vec2 win) {
 	windowHandle = 0;
 	frameCount = 0;
 	caption = "CGJ Engine";
-	camera = Camera(Vec3(5 , 5, 5), Vec3(0, 0, 0));
+	camera = Camera(Vec3(0 , 0, 5), Vec3(0, 0, 0));
 
 	setUpGlut(argc, argv, win);
 	setUpGlew();
@@ -46,8 +46,8 @@ void Application::timer(int value) {
 }
 
 void Application::reshape(int x, int y) {
-	win_.x = x;
-	win_.y = y;
+	win_.x = static_cast<int>(x);
+	win_.y = static_cast<int>(y);
 	glViewport(0, 0, x, y);
 }
 
@@ -55,7 +55,7 @@ void Application::idle() {
 	int t = glutGet(GLUT_ELAPSED_TIME);
 	deltaTime = (t - oldTime) / 1000.0f;
 	oldTime = t;
-	processMovement(0);
+	processMovement();
 	glutPostRedisplay();
 }
 
@@ -83,13 +83,13 @@ void Application::drawScene() {
 	//Triangle small 1
 	srt = MatrixFactory::Translate(Vec3(0.75f, -0.23f, 0)) * MatrixFactory::Rotate(-PI / 4.f, Vec3(0, 0, 1)) * worldScale;
 	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glUniform4fv(ColorUniform, 1, Vec4(1, 1, 0, 1).asArray());
+	glUniform4fv(ColorUniform, 1, Vec4(1.f, 1.f, 0.f, 1.f).asArray());
 	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glUniform4fv(ColorUniform, 1, Vec4(1, .9, 0, 1).asArray());
+	glUniform4fv(ColorUniform, 1, Vec4(1.f, .9f, 0.f, 1.f).asArray());
 	glDrawArrays(GL_TRIANGLES, 3, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(1, .8, 0, 1).asArray());
+	glUniform4fv(ColorUniform, 1, Vec4(1.f, .8f, 0.f, 1.f).asArray());
 	glDrawArrays(GL_TRIANGLES, 9, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(1, .7, 0, 1).asArray());
+	glUniform4fv(ColorUniform, 1, Vec4(1.f, .7f, 0.f, 1).asArray());
 	glDrawArrays(GL_TRIANGLES, 15, 6);
 	glUniform4fv(ColorUniform, 1, Vec4(1, .6, 0, 1).asArray());
 	glDrawArrays(GL_TRIANGLES, 21, 3);
@@ -224,7 +224,7 @@ void Application::keyUpFunc(unsigned char key, int x, int y) {
 	}
 }
 
-void Application::processMovement(int x) {
+void Application::processMovement() {
 	shader->use();
 	GLuint viewLoc = shader->getUniform("ViewMatrix");
 	if(movementKeyPressed[0]) {

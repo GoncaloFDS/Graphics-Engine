@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "../Engine/Mat3.h"
+#include "Mat3.h"
 const float PI = 3.1415926535897;
 
 TEST_CASE("Matrix Constructor") {

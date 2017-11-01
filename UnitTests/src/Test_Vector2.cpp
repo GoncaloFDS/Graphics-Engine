@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-#include "../Engine/Vec2.h"
+#include "Vec2.h"
 
 
 TEST_CASE("Vec2 Cunstructor", "[Vec2]") {

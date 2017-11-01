@@ -47,8 +47,8 @@ void Camera::moveCamera(const movementDir dir, const float deltaTime) {
 }
 
 void Camera::updateVectors() {
-	right = front.Cross(worldUp);
-	up = right.Cross(front);
+	//right = front.Cross(worldUp);
+	//up = right.Cross(front);
 	front.Normalize();
 	right.Normalize();
 	up.Normalize();
@@ -70,9 +70,16 @@ void Camera::moveMouse(int x, int y, Vec2 screen) {
 		offset.x *= mouseSensivity;
 		offset.y *= mouseSensivity;
 
-		Mat4 rotator = MatrixFactory::Rotate(offset.x, up) * 
-			MatrixFactory::Rotate(offset.y, right);
+		Mat4 rotator = MatrixFactory::Rotate(offset.y, right) *  MatrixFactory::Rotate(offset.x, up);
 		front = Mat3(rotator) * front;
+		//Mat4 upRotator = MatrixFactory::Rotate(offset.y, right) ;
+		up = Mat3(rotator) * up;
+		up.x = 0;
+		right = front.Cross(up);
+
+		std::cout << "front " << front << std::endl;
+		std::cout << "right " << right << std::endl;
+		std::cout << "up " << up << std::endl;
 
 		updateVectors();
 	}

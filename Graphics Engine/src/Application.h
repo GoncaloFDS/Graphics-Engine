@@ -57,7 +57,7 @@ private:
 	void createBufferObjects();
 	static void switchProjection();
 	static void keyUpFunc(unsigned char key, int x, int y);
-	static void processMovement(int x);
+	static void processMovement();
 	void setUpCallBacks();
 
 };

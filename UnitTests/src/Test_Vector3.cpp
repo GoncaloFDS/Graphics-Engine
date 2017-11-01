@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "../Engine/Vec3.h"
+#include "Vec3.h"
 
 TEST_CASE("Vec3 Cunstructor", "[Vec3]") {
 	Vec3 v(1, 2, 3);
