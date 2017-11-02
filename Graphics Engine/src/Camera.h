@@ -2,6 +2,7 @@
 #include "Vec2.h"
 #include "Vec3.h"
 #include "Mat4.h"
+#include "Quat.h"
 
 #define PI 3.1415927
 
@@ -16,20 +17,16 @@ enum movementDir {
 
 class Camera {
 private:
-	Vec3 front;
-	Vec3 right;
-	Vec3 up;
-	Vec3 worldUp;
-
 	float movementSpeed;
 	float mouseSensivity;
 
-	float yaw;
-	float pitch;
 	Vec2 lastMouse;
 	bool leftButtonPressed = false;
 	bool firstMouseInput = true;
-	float frontDist;
+	Vec3 rotationAngle;
+	float zoomDistance;
+	Quat q;
+	Vec3 rotationDelta;
 
 public:
 	Camera() = default;
@@ -37,14 +34,14 @@ public:
 	~Camera() = default;
 	Vec3 position;
 	Mat4 viewMatrix;
+	bool usingQuaternions;
 
 	void setLeftButton(bool b);
 	void setIsFirstMouseInput(bool b);
 
 	void moveCamera(movementDir dir, float deltaTime);
-	void updateVectors();
 	void moveMouse(int x, int y, Vec2 screen);
-	Mat4 getViewMatrix() const;
+	Mat4 getViewMatrix();
 
 };
 

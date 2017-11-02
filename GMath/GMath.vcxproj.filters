@@ -33,7 +33,7 @@
     <ClCompile Include="src\Vec4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Quat.cpp">
+    <ClCompile Include="src\Quat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClInclude Include="src\Vec4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Quat.h">
+    <ClInclude Include="src\Quat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

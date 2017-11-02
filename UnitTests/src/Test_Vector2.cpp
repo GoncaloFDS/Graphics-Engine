@@ -3,6 +3,7 @@
 #include "Vec2.h"
 
 
+
 TEST_CASE("Vec2 Cunstructor", "[Vec2]") {
 	Vec2 v(1, 2);
 	CHECK(v.x == 1);

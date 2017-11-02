@@ -18,7 +18,7 @@ Mat4 MatrixFactory::Translate(const Vec3& t) {
 	};
 }
 
-Mat4 MatrixFactory::Rotate(const float angle, Vec3& axis) {
+Mat4 MatrixFactory::Rotate(const float angle, Vec3 axis) {
 	axis.Normalize();
 	return Mat4(1.0f) + sin(angle) * CrossMatrix(axis)
 		+ (1 - cos(angle)) * SqrCrossMatrix(axis);

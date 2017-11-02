@@ -222,6 +222,16 @@ void Application::keyUpFunc(unsigned char key, int x, int y) {
 	if (key == 'q') {
 		movementKeyPressed[5] = false;
 	}
+	if (key == 'g') {
+		camera.usingQuaternions = !camera.usingQuaternions;
+		shader->use();
+		GLuint viewLoc = shader->getUniform("ViewMatrix");
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
+		if(camera.usingQuaternions)
+			std::cout << "Using Quaternions" << std::endl;
+		else
+			std::cout << "Using Euler Rotation" << std::endl;
+	}
 }
 
 void Application::processMovement() {
@@ -256,7 +266,7 @@ void Application::processMovement() {
 
 void Application::mouseMoveInput(int x, int y) {
 	shader->use();
-	camera.moveMouse(x, y, win_); //FPS Camera
+	camera.moveMouse(x, y, win_); 
 
 	GLuint viewLoc = shader->getUniform("ViewMatrix");
 	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);

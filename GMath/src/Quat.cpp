@@ -1,6 +1,6 @@
 #include "Quat.h"
 
-Quat::Quat(float t, float x, float y, float z) : t(t), x(x), y(y), z(z)
+Quat::Quat(float t_, float x_, float y_, float z_) : t(t_), x(x_), y(y_), z(z_)
 {}
 
 Quat::Quat(float theta, Vec4 axis) {
@@ -98,29 +98,24 @@ Mat4 Quat::GetGLMatrix() {
 	float yt = y * t;
 	float zz = z * z;
 	float zt = z * t;
-	Mat4 matrix;
-	matrix.entry[0] = 1.0f - 2.0f * (yy + zz);
-	matrix.entry[1] = 2.0f * (xy + zt);
-	matrix.entry[2] = 2.0f * (xz - yt);
-	matrix.entry[3] = 0.0f;
-
-	matrix.entry[4] = 2.0f * (xy - zt);
-	matrix.entry[5] = 1.0f - 2.0f * (xx + zz);
-	matrix.entry[6] = 2.0f * (yz + xt);
-	matrix.entry[7] = 0.0f;
-
-	matrix.entry[8] = 2.0f * (xz + yt);
-	matrix.entry[9] = 2.0f * (yz - xt);
-	matrix.entry[10] = 1.0f - 2.0f * (xx + yy);
-	matrix.entry[11] = 0.0f;
-
-	matrix.entry[12] = 0.0f;
-	matrix.entry[13] = 0.0f;
-	matrix.entry[14] = 0.0f;
-	matrix.entry[15] = 1.0f;
+	Mat4 matrix {
+		1.0f - 2.0f * (yy + zz),  2.0f * (xy - zt) , 2.0f * (xz + yt), 0,
+		2.0f * (xy + zt) , 1.0f - 2.0f * (xx + zz) , 2.0f * (yz - xt), 0,
+		2.0f * (xz - yt), 2.0f * (yz + xt), 1.0f - 2.0f * (xx + yy), 0,
+		0, 0, 0, 1
+	};
 
 	matrix.Clean();
 	return matrix;
+}
+
+bool Quat::operator==(const Quat q) {
+	return (fabs(t - q.t) < CloseToZero && fabs(x - q.x) < CloseToZero &&
+		fabs(y - q.y) < CloseToZero && fabs(z - q.z) < CloseToZero);
+}
+
+Quat Quat::Inverse() {
+	return Conjugate() * (1.0f / Quadrance());
 }
 
 Quat Quat::Lerp(const Quat target, float k) {

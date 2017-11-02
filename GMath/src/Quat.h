@@ -1,6 +1,6 @@
 #pragma once
-#include "src/Vec4.h"
-#include "src/Mat4.h"
+#include "Vec4.h"
+#include "Mat4.h"
 
 #define DEGREES_TO_RADIANS (float)0.01745329251994329547
 #define RADIANS_TO_DEGREES (float)57.29577951308232185913
@@ -28,6 +28,9 @@ public:
 	Quat operator*(const float s) const;
 	friend Quat operator*(const float s, const Quat q);
 	Mat4 GetGLMatrix();
+
+	bool operator==(const Quat q);
+	Quat Inverse();
 
 	Quat Lerp(const Quat target, float k);
 	Quat Slerp(const Quat target, float k);

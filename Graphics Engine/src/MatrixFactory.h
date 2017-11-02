@@ -9,7 +9,7 @@ public:
 
 	static Mat4 Identity();
 	static Mat4 Translate(const Vec3& translation);
-	static Mat4 Rotate(const float angle, Vec3& axis);
+	static Mat4 Rotate(const float angle, Vec3 axis);
 	static Mat4 Scale(const Vec3& scale);
 
 	static Mat4 Transpose(const Mat4& matrix);
