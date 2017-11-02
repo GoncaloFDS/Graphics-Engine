@@ -22,7 +22,7 @@ Application::Application(int argc, char* argv[], const Vec2 win) {
 	windowHandle = 0;
 	frameCount = 0;
 	caption = "CGJ Engine";
-	camera = Camera(Vec3(0 , 0, 5), Vec3(0, 0, 0));
+	camera = Camera(Vec3(0 , 0, 15), Vec3(0, 0, 0));
 
 	setUpGlut(argc, argv, win);
 	setUpGlew();
@@ -256,7 +256,8 @@ void Application::processMovement() {
 
 void Application::mouseMoveInput(int x, int y) {
 	shader->use();
-	camera.moveMouse(x, y, win_);
+	camera.moveMouse(x, y, win_); //FPS Camera
+
 	GLuint viewLoc = shader->getUniform("ViewMatrix");
 	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
 

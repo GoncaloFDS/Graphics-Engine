@@ -36,6 +36,7 @@ public:
 	Camera(Vec3 pos, Vec3 center);
 	~Camera() = default;
 	Vec3 position;
+	Mat4 viewMatrix;
 
 	void setLeftButton(bool b);
 	void setIsFirstMouseInput(bool b);

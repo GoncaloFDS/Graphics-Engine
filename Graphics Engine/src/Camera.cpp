@@ -19,36 +19,35 @@ Camera::Camera(const Vec3 pos, const Vec3 center) {
 
 	movementSpeed = 3.f;
 	mouseSensivity = 0.002f;
+	viewMatrix = MatrixFactory::Translate(Vec3(0, 0, -15));
 }
 
 
-void Camera::setLeftButton(bool b) {
+void Camera::setLeftButton(const bool b) {
 	leftButtonPressed = b;
 }
 
-void Camera::setIsFirstMouseInput(bool b) {
+void Camera::setIsFirstMouseInput(const bool b) {
 	firstMouseInput = b;
 }
 
 void Camera::moveCamera(const movementDir dir, const float deltaTime) {
 	const float velocity = movementSpeed * deltaTime;
-	if (dir == Forward)
-		position += front * velocity;
-	if (dir == Backward)
-		position -= front * velocity;
-	if (dir == Right)
-		position += right * velocity;
-	if (dir == Left)
-		position -= right * velocity;
-	if (dir == Up)
-		position += up * velocity;
-	if (dir == Down)
-		position -= up * velocity;
+	//if (dir == Forward)
+	//	position += front * velocity;
+	//if (dir == Backward)
+	//	position -= front * velocity;
+	//if (dir == Right)
+	//	position += right * velocity;
+	//if (dir == Left)
+	//	position -= right * velocity;
+	//if (dir == Up)
+	//	position += up * velocity;
+	//if (dir == Down)
+	//	position -= up * velocity;
 }
 
 void Camera::updateVectors() {
-	//right = front.Cross(worldUp);
-	//up = right.Cross(front);
 	front.Normalize();
 	right.Normalize();
 	up.Normalize();
@@ -70,18 +69,22 @@ void Camera::moveMouse(int x, int y, Vec2 screen) {
 		offset.x *= mouseSensivity;
 		offset.y *= mouseSensivity;
 
-		Mat4 rotator = MatrixFactory::Rotate(offset.y, right) *  MatrixFactory::Rotate(offset.x, up);
+		/*Mat4 rotator = MatrixFactory::Rotate(offset.y, right) *  MatrixFactory::Rotate(offset.x, up);
 		front = Mat3(rotator) * front;
-		//Mat4 upRotator = MatrixFactory::Rotate(offset.y, right) ;
 		up = Mat3(rotator) * up;
 		up.x = 0;
 		right = front.Cross(up);
-		updateVectors();
+		updateVectors();*/
+
+		viewMatrix = viewMatrix * MatrixFactory::Rotate(-offset.x, up) * MatrixFactory::Rotate(-offset.y, right);
+		//up = up * 
+
 	}
 }
 
 Mat4 Camera::getViewMatrix() const {
-	return MatrixFactory::LookAt(position, position + front, up);
+	return viewMatrix;
+	//return MatrixFactory::LookAt(position, position + front, up);
 }
 
 

@@ -25,7 +25,7 @@ Mat4 MatrixFactory::Rotate(const float angle, Vec3& axis) {
 }
 
 Mat4 MatrixFactory::Scale(const Vec3& s) {
-	return Mat4{
+	return Mat4 {
 		s.x, 0, 0, 0,
 		0, s.y, 0, 0,
 		0, 0, s.z, 0,
@@ -34,7 +34,7 @@ Mat4 MatrixFactory::Scale(const Vec3& s) {
 }
 
 Mat4 MatrixFactory::Transpose(const Mat4& m) {
-	return Mat4{
+	return Mat4 {
 		m.entry[0], m.entry[4], m.entry[8], m.entry[12],
 		m.entry[1], m.entry[5], m.entry[9], m.entry[13],
 		m.entry[2], m.entry[6], m.entry[10], m.entry[14],
@@ -43,7 +43,7 @@ Mat4 MatrixFactory::Transpose(const Mat4& m) {
 }
 
 Mat4 MatrixFactory::CrossMatrix(const Vec3& k) {
-	return Mat4{
+	return Mat4 {
 		0, -k.z, k.y, 0,
 		k.z, 0, -k.x, 0,
 		-k.y, k.x, 0, 0,
@@ -52,7 +52,7 @@ Mat4 MatrixFactory::CrossMatrix(const Vec3& k) {
 }
 
 Mat4 MatrixFactory::SqrCrossMatrix(const Vec3& k) {
-	return Mat4{
+	return Mat4 {
 		-(k.z * k.z) - (k.y * k.y), k.x * k.y, k.x * k.z, 0,
 		k.x * k.y, -(k.z * k.z) - (k.x * k.x), k.y * k.z, 0,
 		k.x * k.z, k.y * k.z, -(k.x * k.x) - (k.y * k.y), 0,
@@ -61,7 +61,7 @@ Mat4 MatrixFactory::SqrCrossMatrix(const Vec3& k) {
 }
 
 Mat4 MatrixFactory::Ortho(const float l, const float r, const float t, const float b, const float n, const float f) {
-	return Mat4{
+	return Mat4 {
 		2.f / (r - l), 0, 0, (l + r) / (l - r),
 		0, 2.f / (t - b), 0, (b + t) / (b - t),
 		0, 0, 2.f / (n - f), (n + f) / (n - f),
@@ -71,7 +71,7 @@ Mat4 MatrixFactory::Ortho(const float l, const float r, const float t, const flo
 
 Mat4 MatrixFactory::Perspective(const float fov, const float ratio, const float n, const float f) {
 	const float d = 1.f / tan(fov / 2.f);
-	return Mat4{
+	return Mat4 {
 		d / ratio, 0, 0, 0,
 		0, d, 0, 0,
 		0, 0, (n + f) / (n - f), 2.f*f*n/(n -f),
