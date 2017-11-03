@@ -23,10 +23,11 @@ private:
 	Vec2 lastMouse;
 	bool leftButtonPressed = false;
 	bool firstMouseInput = true;
-	Vec3 rotationAngle;
+	Vec3 rotationDeltaR;
 	float zoomDistance;
 	Quat q;
-	Vec3 rotationDelta;
+	Mat4 r;
+	Vec3 rotationDeltaQ;
 
 public:
 	Camera() = default;

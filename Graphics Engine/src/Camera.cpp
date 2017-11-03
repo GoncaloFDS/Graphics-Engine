@@ -12,12 +12,13 @@ Camera::Camera(const Vec3 pos, const Vec3 center) {
 	position = pos;
 	movementSpeed = 3.f;
 	mouseSensivity = 0.005f;
-	rotationAngle = { 0, 0, 0 };
-	rotationDelta = { 0, 0, 0 };
+	rotationDeltaR = { 0, 0, 0 };
+	rotationDeltaQ = { 0, 0, 0 };
 	viewMatrix = MatrixFactory::Translate(Vec3(0, 0, -15));
 	zoomDistance = 0;
 	usingQuaternions = false;
 	q = Quat(1, 0, 0, 0);
+	r = MatrixFactory::Identity();
 }
 
 
@@ -36,12 +37,12 @@ void Camera::moveCamera(const movementDir dir, const float deltaTime) {
 	if (dir == Backward)
 		zoomDistance -= velocity;
 	if (dir == Up) {
-		rotationAngle.z += velocity;
-		rotationDelta.z = velocity;
+		rotationDeltaR.z += velocity;
+		rotationDeltaQ.z = velocity;
 	}
 	if (dir == Down) {
-		rotationAngle.z -= velocity;
-		rotationDelta.z = -velocity;
+		rotationDeltaR.z -= velocity;
+		rotationDeltaQ.z = -velocity;
 	}
 }
 
@@ -53,11 +54,11 @@ void Camera::moveMouse(int x, int y, Vec2 screen) {
 			firstMouseInput = false;
 		}
 
-		rotationAngle.x += (lastMouse.x - x) * mouseSensivity;
-		rotationAngle.y += (lastMouse.y - y) * mouseSensivity;
+		rotationDeltaR.x += (lastMouse.x - x) * mouseSensivity;
+		rotationDeltaR.y += (lastMouse.y - y) * mouseSensivity;
 
-		rotationDelta.x = (lastMouse.x - x) *0.5f ;
-		rotationDelta.y = (lastMouse.y - y) *0.5f;
+		rotationDeltaQ.x = (lastMouse.x - x) *0.5f ;
+		rotationDeltaQ.y = (lastMouse.y - y) *0.5f;
 
 		lastMouse.x = x;
 		lastMouse.y = y;
@@ -66,16 +67,20 @@ void Camera::moveMouse(int x, int y, Vec2 screen) {
 }
 
 Mat4 Camera::getViewMatrix() {
-	if(!usingQuaternions)
-		viewMatrix = MatrixFactory::Translate(Vec3(0, 0, -10 + zoomDistance)) * 
-		MatrixFactory::Rotate(rotationAngle.x, Vec3(0, 1, 0)) * 
-		MatrixFactory::Rotate(rotationAngle.y, Vec3(1, 0, 0)) * 
-		MatrixFactory::Rotate(rotationAngle.z, Vec3(0, 0, 1));
+	if(!usingQuaternions) {
+		r = MatrixFactory::Rotate(rotationDeltaR.x, Vec3(0, 1, 0)) *
+			MatrixFactory::Rotate(rotationDeltaR.y, Vec3(1, 0, 0)) *
+			MatrixFactory::Rotate(rotationDeltaR.z, Vec3(0, 0, 1)) ;
+		//rotationDeltaR = { 0, 0, 0 };
+
+		viewMatrix = MatrixFactory::Translate(Vec3(0, 0, -10 + zoomDistance)) * r;
+
+	}
 	else {
-		q = Quat(rotationDelta.x, Vec4(0, 1, 0, 1)) * 
-			Quat(rotationDelta.y, Vec4(1, 0, 0, 1)) * 
-			Quat(rotationDelta.z * 50, Vec4(0, 0, 1, 1)) * q;
-		rotationDelta = { 0, 0, 0 };
+		q = Quat(rotationDeltaQ.x, Vec4(0, 1, 0, 1)) * 
+			Quat(rotationDeltaQ.y, Vec4(1, 0, 0, 1)) * 
+			Quat(rotationDeltaQ.z * 50, Vec4(0, 0, 1, 1)) * q;
+		rotationDeltaQ = { 0, 0, 0 };
 		viewMatrix = MatrixFactory::Translate(Vec3(0, 0, -10 + zoomDistance)) * q.GetGLMatrix();
 	}
 	
