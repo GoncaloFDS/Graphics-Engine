@@ -121,6 +121,7 @@
     <ClCompile Include="src\Mat2.cpp" />
     <ClCompile Include="src\Mat3.cpp" />
     <ClCompile Include="src\Mat4.cpp" />
+    <ClCompile Include="src\MatrixFactory.cpp" />
     <ClCompile Include="src\Quat.cpp" />
     <ClCompile Include="src\Vec2.cpp" />
     <ClCompile Include="src\Vec3.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="src\Mat3.h" />
     <ClInclude Include="src\Mat4.h" />
     <ClInclude Include="src\MathExceptions.h" />
+    <ClInclude Include="src\MatrixFactory.h" />
     <ClInclude Include="src\Quat.h" />
     <ClInclude Include="src\Vec2.h" />
     <ClInclude Include="src\Vec3.h" />

@@ -4,7 +4,7 @@
 
 #define DEGREES_TO_RADIANS (float)0.01745329251994329547
 #define RADIANS_TO_DEGREES (float)57.29577951308232185913
-const float CloseToZero = 1.0e-5;
+const float CloseToZero = static_cast<float>(1.0e-5);
 
 class Quat {
 private:

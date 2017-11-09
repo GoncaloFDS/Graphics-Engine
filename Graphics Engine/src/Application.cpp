@@ -2,7 +2,7 @@
 #include "MatrixFactory.h"
 #include "Shader.h"
 
-#define PI 3.1415927
+#define PI (float)3.1415927
 
 
 int Application::windowHandle;
@@ -46,8 +46,8 @@ void Application::timer(int value) {
 }
 
 void Application::reshape(int x, int y) {
-	win_.x = static_cast<int>(x);
-	win_.y = static_cast<int>(y);
+	win_.x = static_cast<float>(x);
+	win_.y = static_cast<float>(y);
 	glViewport(0, 0, x, y);
 }
 

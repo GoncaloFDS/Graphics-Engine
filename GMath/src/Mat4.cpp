@@ -1,7 +1,7 @@
 #include "Mat4.h"
 #include "MathExceptions.h"
 #include "Mat3.h"
-#include "../../Graphics Engine/src/MatrixFactory.h"
+#include "MatrixFactory.h"
 
 
 /* OpenGl Column major format

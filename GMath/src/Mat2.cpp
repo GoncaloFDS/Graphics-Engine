@@ -14,7 +14,7 @@ Mat2::Mat2(const float e[4]) {
 
 Mat2::Mat2(const float diagonal) {
 	entry[0] = diagonal;
-	entry[4] = diagonal;
+	entry[3] = diagonal;
 }
 
 bool Mat2::operator==(Mat2& other) const {
@@ -131,7 +131,7 @@ Mat2 operator*(const Mat2 left, const float scalar) {
 
 Mat2 Mat2::operator*=(const float scalar) {
 	float temp[4];
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 4; i++)
 		temp[i] = entry[i] * scalar;
 	for (int i = 0; i < 4; i++)
 		entry[i] = temp[i];
