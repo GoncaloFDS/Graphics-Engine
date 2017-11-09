@@ -43,7 +43,7 @@ artifacts/
 *_i.h
 *.ilk
 *.meta
-*.obj
+#*.obj
 *.pch
 *.pdb
 *.pgc
@@ -209,3 +209,11 @@ FakesAssemblies/
 **/*.Server/GeneratedArtifacts
 **/*.Server/ModelManifest.xml
 _Pvt_Extensions
+
+GMath/Debug/
+
+GMath/intermediates/x64/Release/
+
+Graphics Engine/intermediates/x64/Release/Application\.obj
+
+Graphics Engine/intermediates/x64/Release/
