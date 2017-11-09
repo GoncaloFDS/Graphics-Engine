@@ -17,6 +17,17 @@ int Application::oldTime;
 float Application::deltaTime;
 bool Application::movementKeyPressed[6];
 
+void Application::createSceneMatrices() {
+	shader->use();
+
+	GLuint viewLoc = shader->getUniform("ViewMatrix");
+	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
+
+	GLuint projLoc = shader->getUniform("ProjectionMatrix");
+	glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Perspective(PI / 6.f, 640.f / 480.f, 1, 30).entry);
+	projectionType = Projection::Perspective;
+}
+
 Application::Application(int argc, char* argv[], const Vec2 win) {
 	win_ = win;
 	windowHandle = 0;
@@ -29,6 +40,7 @@ Application::Application(int argc, char* argv[], const Vec2 win) {
 	setUpOpenGl();
 	createShaderProgram();
 	createBufferObjects();
+	createSceneMatrices();
 	setUpCallBacks();
 
 	oldTime = glutGet(GLUT_ELAPSED_TIME);
@@ -457,17 +469,6 @@ void Application::createBufferObjects() {
 	createCubeBuffers();
 	createTriangleBuffers();
 	createParallelogramBuffers();
-
-	checkOpenGlError("ERROR: 1.");
-	shader->use();
-
-	GLuint viewLoc = shader->getUniform("ViewMatrix");
-	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, camera.getViewMatrix().entry);
-
-	GLuint projLoc = shader->getUniform("ProjectionMatrix");
-	glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Perspective(PI / 6.f, 640.f / 480.f, 1, 30).entry);
-	projectionType = Projection::Perspective;
-	//glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::Ortho(-2, 2, 2, -2, 1, 10).entry);
 
 	checkOpenGlError("ERROR: Could not create VAOs and VBOs.");
 }

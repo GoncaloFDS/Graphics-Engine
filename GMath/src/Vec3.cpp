@@ -14,13 +14,9 @@ std::ostream& operator<<(std::ostream& os, const Vec3& vec) {
 }
 
 std::istream& operator>>(std::istream& is, Vec3& vector) {
-		is.ignore(1, '(');
 		is >> vector.x;
-		is.ignore(2, ' ');
 		is >> vector.y;
-		is.ignore(2, ' ');
 		is >> vector.z;
-		is.ignore(10, '\n');
 		return is;
 }
 

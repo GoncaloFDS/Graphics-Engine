@@ -32,6 +32,8 @@ private:
 	static int oldTime;
 	static float deltaTime;
 	static bool movementKeyPressed[6];
+	
+	static void createSceneMatrices();
 
 	static bool isOpenGlError();
 	static void checkOpenGlError(std::string error);

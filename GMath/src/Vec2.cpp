@@ -13,11 +13,8 @@ std::ostream& operator<<(std::ostream& os, const Vec2& vec) {
 }
 
 std::istream& operator>>(std::istream& is, Vec2& vector) {
-	is.ignore(1, '(');
 	is >> vector.x;
-	is.ignore(2, ' ');
 	is >> vector.y;
-	is.ignore(10, '\n');
 	return is;
 }
 
