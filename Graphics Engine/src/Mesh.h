@@ -7,9 +7,13 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include "Shader.h"
 
+#define VERTICES 0
+#define TEXCOORDS 1
+#define NORMALS 2
 
-class Mesh{
+class Mesh {
 	std::vector<Vec3> Vertices, VertexData;
 	std::vector<Vec2> Texcoords, TexcoordData;
 	std::vector<Vec3> Normals, NormalData;
@@ -17,7 +21,7 @@ class Mesh{
 	bool TexcoordsLoaded = false;
 	bool NormalsLoaded = false;
 
-	GLuint VaoId;
+	GLuint VAO, EBO;
 	GLuint VboVertices, VboTexcoords, VboNormals;
 
 
@@ -31,10 +35,14 @@ class Mesh{
 	void parseFace(std::stringstream& sin);
 	void parseLine(std::stringstream& sin);
 
+	void createBuffers();
+	void destroyBuffers();
 public:
-	Mesh(std::string& filename, GLuint id);
+	Mesh(std::string& filename);
 	Mesh() = default;
 	~Mesh() = default;
+
+	void draw(Shader* shader);
 	
 	void loadMesh(std::string& filename);
 };

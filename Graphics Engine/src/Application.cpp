@@ -1,9 +1,11 @@
 ﻿#include "Application.h"
 #include "MatrixFactory.h"
 #include "Shader.h"
+#include "Mesh.h"
 
 #define PI (float)3.1415927
 
+Mesh* cube;
 
 int Application::windowHandle;
 int Application::frameCount;
@@ -39,7 +41,8 @@ Application::Application(int argc, char* argv[], const Vec2 win) {
 	setUpGlew();
 	setUpOpenGl();
 	createShaderProgram();
-	createBufferObjects();
+	//createBufferObjects();
+	cube = new Mesh(std::string("meshes/cube_vn.obj"));
 	createSceneMatrices();
 	setUpCallBacks();
 
@@ -72,107 +75,13 @@ void Application::idle() {
 }
 
 void Application::drawScene() {
-	glUseProgram(shader->ID);
+	shader->use();
+	GLint modelUniform = shader->getUniform("ModelMatrix");
+	GLint colorUniform = shader->getUniform("Color");
+	glUniformMatrix4fv(modelUniform, 1, GL_TRUE, MatrixFactory::Identity().entry);
+	glUniform4fv(colorUniform, 1, Vec4(1, 0, 0, 1).asArray());
+	cube->draw(shader);
 
-	GLint matrixUniform = shader->getUniform("ModelMatrix");
-	Mat4 worldScale = MatrixFactory::Scale(Vec3(0.5f, 0.5f, 0.5f));
-	GLint ColorUniform = shader->getUniform("Color");
-
-	
-	glBindVertexArray(VAO[0]);
-
-	//Cube
-	Mat4 srt = MatrixFactory::Translate(Vec3(0.75f, 0.15f, 0.0f)) * MatrixFactory::Rotate(PI / 4.f, Vec3(0.0f, 0.0f, 1.0f)) *
-		worldScale;
-	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	for(int i = 0; i < 6; i++) {
-		glUniform4fv(ColorUniform, 1, Vec4(1-i*0.1, 0, 0, 1).asArray());
-		glDrawArrays(GL_TRIANGLES, i*6, 6);
-	}
-	
-	glBindVertexArray(VAO[1]);
-
-	//Triangle small 1
-	srt = MatrixFactory::Translate(Vec3(0.75f, -0.23f, 0)) * MatrixFactory::Rotate(-PI / 4.f, Vec3(0, 0, 1)) * worldScale;
-	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glUniform4fv(ColorUniform, 1, Vec4(1.f, 1.f, 0.f, 1.f).asArray());
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glUniform4fv(ColorUniform, 1, Vec4(1.f, .9f, 0.f, 1.f).asArray());
-	glDrawArrays(GL_TRIANGLES, 3, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(1.f, .8f, 0.f, 1.f).asArray());
-	glDrawArrays(GL_TRIANGLES, 9, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(1.f, .7f, 0.f, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 15, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(1, .6, 0, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 21, 3);
-	//Triangle small 2
-	srt = MatrixFactory::Translate(Vec3(-0.05f, -0.62f, 0)) * MatrixFactory::Scale(Vec3(1, 1, 1.7))* worldScale;
-	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glUniform4fv(ColorUniform, 1, Vec4(0, 1, 1, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glUniform4fv(ColorUniform, 1, Vec4(0, 1, .9, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 3, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0, 1, .8, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 9, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0, 1, .7, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 15, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0, 1, .6, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 21, 3);
-	//Triangle medium
-	srt = MatrixFactory::Translate(Vec3(0.28f, 0.25f, 0)) * MatrixFactory::Rotate(-PI / 4.f, Vec3(0.0f, 0.0f, 1)) *
-		MatrixFactory::Scale(Vec3(1.5f, 1.5f, 1.5f)) * worldScale;
-	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, 1, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, .9, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 3, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, .8, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 9, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, .7, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 15, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, .6, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 21, 3);
-	//Triangle large 1
-	srt = MatrixFactory::Translate(Vec3(-0.475f, 0.245f, 0.0f)) * MatrixFactory::Rotate(-3 * PI / 4, Vec3(0, 0.0f, 1)) *
-		MatrixFactory::Scale(Vec3(2, 2, 2)) * worldScale;
-	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glUniform4fv(ColorUniform, 1, Vec4(0.1, .2, 1, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glUniform4fv(ColorUniform, 1, Vec4(0.1, .2, .9, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 3, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0.1, .2, .8, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 9, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0.1, .2, .7, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 15, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0.1, .2, .6, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 21, 3);
-	//Triangle large 2
-	srt = MatrixFactory::Translate(Vec3(-0.1f, 0.1f, 0.0f)) * MatrixFactory::Rotate(-PI / 2, Vec3(0.0f, 0.0f, 1)) *
-		MatrixFactory::Scale(Vec3(2, 2, 2))  * MatrixFactory::Scale(Vec3(1, 1, 1.3)) * worldScale;
-	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	glUniform4fv(ColorUniform, 1, Vec4(0.9, .2, .2, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glUniform4fv(ColorUniform, 1, Vec4(0.8, .2, .2, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 3, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0.7, .2, .2, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 9, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0.6, .2, .2, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 15, 6);
-	glUniform4fv(ColorUniform, 1, Vec4(0.5, .2, .2, 1).asArray());
-	glDrawArrays(GL_TRIANGLES, 21, 3);
-
-	glBindVertexArray(VAO[2]);
-
-	//Parallelogram
-	srt = MatrixFactory::Translate(Vec3(-0.375f, -0.38f, 0.0f))* worldScale;
-	glUniformMatrix4fv(matrixUniform, 1, GL_TRUE, srt.entry);
-	for (int i = 0; i < 6; i++) {
-		glUniform4fv(ColorUniform, 1, Vec4(0.4, 1 - i*0.1, 0, 1).asArray());
-		glDrawArrays(GL_TRIANGLES, i * 6, 6);
-	}
-
-	glUseProgram(0);
-	glBindVertexArray(0);
 
 	checkOpenGlError("ERROR: Could not draw scene.");
 }
