@@ -17,5 +17,5 @@ void main(void) {
 	exTexcoord = inTexture;
 	exNormal = inNormal;
 
-	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(inPosition);
+	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(inPosition, 1);
 }

@@ -2,10 +2,15 @@
 #include "MatrixFactory.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "SceneGraph.h"
 
 #define PI (float)3.1415927
 
 Mesh* cube;
+Mesh* triangle;
+Mesh* prlgram;
+SceneGraph* sceneGraph;
+SceneNode* cubeNode;
 
 int Application::windowHandle;
 int Application::frameCount;
@@ -35,14 +40,26 @@ Application::Application(int argc, char* argv[], const Vec2 win) {
 	windowHandle = 0;
 	frameCount = 0;
 	caption = "CGJ Engine";
-	camera = Camera(Vec3(0 , 0, 15), Vec3(0, 0, 0));
+	camera = Camera(Vec3(0 , 0, -15), Vec3(0, 0, 0));
 
 	setUpGlut(argc, argv, win);
 	setUpGlew();
 	setUpOpenGl();
 	createShaderProgram();
-	//createBufferObjects();
-	cube = new Mesh(std::string("meshes/cube_vn.obj"));
+	cube = new Mesh(std::string("meshes/cube_v.obj"));
+	triangle = new Mesh(std::string("meshes/triangle_v.obj"));
+	prlgram = new Mesh(std::string("meshes/parallelogram_v.obj"));
+
+	sceneGraph = new SceneGraph();
+	SceneNode* n = sceneGraph->getRoot();
+	n->setShader(shader);
+
+	cubeNode = sceneGraph->createNode();
+	cubeNode->setMesh(cube);
+	cubeNode->setMatrix(MatrixFactory::Translate(Vec3(0, 1, 0)));
+	SceneNode* parlNode = sceneGraph->createNode();
+	parlNode->setMesh(prlgram);
+	parlNode->setMatrix(MatrixFactory::Translate(Vec3(0, -1, 0)));
 	createSceneMatrices();
 	setUpCallBacks();
 
@@ -75,13 +92,8 @@ void Application::idle() {
 }
 
 void Application::drawScene() {
-	shader->use();
-	GLint modelUniform = shader->getUniform("ModelMatrix");
-	GLint colorUniform = shader->getUniform("Color");
-	glUniformMatrix4fv(modelUniform, 1, GL_TRUE, MatrixFactory::Identity().entry);
-	glUniform4fv(colorUniform, 1, Vec4(1, 0, 0, 1).asArray());
-	cube->draw(shader);
-
+	sceneGraph->update(); //TODO remove from every frame
+	sceneGraph->draw();
 
 	checkOpenGlError("ERROR: Could not draw scene.");
 }
@@ -210,178 +222,6 @@ void Application::createShaderProgram() const {
 	checkOpenGlError("ERROR: Could not create shaders.");
 }
 
-void Application::createCubeBuffers() const {
-	const Vertex cubeVertices[]{
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0 - Front
-		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { 0.0f, -0.5f, 0.0f, 1.0f } }, // 2
-		{ { 0.0f, -0.5f, 0.0f, 1.0f } }, // 2
-		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, // 3
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
-		
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0 - Top Right
-		{ { 0.5f, 0.0f, -1.0f, 1.0f } }, // 7
-		{ { 0.0f, 0.5f, -1.0f, 1.0f } }, // 4
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
-		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, // 3
-		{ { 0.5f, 0.0f, -1.0f, 1.0f } }, //7
-
-		{ { 0.0f, -0.5f, 0.0f, 1.0f } }, // 2 - Bottom Left
-		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6
-		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, // 3
-		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, //3
-		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6
-		{ { 0.5f, 0.0f, -1.0f, 1.0f } }, // 7
-
-		{ { -0.5f, 0.0f, -1.0f, 1.0f } }, // 5 - Top Left
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
-		{ { 0.0f, 0.5f, -1.0f, 1.0f } }, // 4
-		{ { -0.5f, 0.0f, -1.0f, 1.0f } }, // 5
-		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
-
-		{ { 0.0f, -0.5f, 0.0f, 1.0f } }, // 2 - Bottom Left
-		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6
-		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { -0.5f, 0.0f, -1.0f, 1.0f } }, // 5
-		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6
-
-		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6 - Back
-		{ { -0.5f, 0.0f, -1.0f, 1.0f } }, // 5
-		{ { 0.0f, 0.5f, -1.0f, 1.0f } }, // 4
-		{ { 0.0f, -0.5f, -1.0f, 1.0f } }, // 6
-		{ { 0.0f, 0.5f, -1.0f, 1.0f } }, // 4
-		{ { 0.5f, 0.0f, -1.0f, 1.0f } }, // 7
-		
-	};
-
-	glBindVertexArray(VAO[0]);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0); //Vertices
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
-void Application::createTriangleBuffers() {
-	const Vertex triangleVertices[]{
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0 - Front
-		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, //2
-
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0 - Right
-		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, //2
-		{ { 0.5f, 0.0f, -0.5f, 1.0f } }, // 5
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
-		{ { 0.5f, 0.0f, -0.5f, 1.0f } }, // 5
-		{ { 0.0f, 0.5f, -0.5f, 1.0f } }, // 3
-
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0 - Left
-		{ { -0.5f, 0.0f, -0.5f, 1.0f } }, // 4
-		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { 0.0f, 0.5f, 0.0f, 1.0f } }, // 0
-		{ { 0.0f, 0.5f, -0.5f, 1.0f } }, // 3
-		{ { -0.5f, 0.0f, -0.5f, 1.0f } }, // 4
-
-		{ { -0.5f, 0.0f, 0.0f, 1.0f } }, // 1
-		{ { -0.5f, 0.0f, -0.5f, 1.0f } }, // 4
-		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, //2
-		{ { 0.5f, 0.0f, 0.0f, 1.0f } }, //2
-		{ { -0.5f, 0.0f, -0.5f, 1.0f } }, // 4
-		{ { 0.5f, 0.0f, -0.5f, 1.0f } }, // 5
-
-		{ { 0.0f, 0.5f, -0.5f, 1.0f } }, // 3
-		{ { 0.5f, 0.0f, -0.5f, 1.0f } }, // 5
-		{ { -0.5f, 0.0f, -0.5f, 1.0f } }, // 4
-
-	};
-
-	glBindVertexArray(VAO[1]);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0); //Vertices
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
-void Application::createParallelogramBuffers() {
-	const Vertex parallVertices[]{
-		{ { 0.0f, 0.0f, 0.0f, 1.0f }}, // 0 - Front
-		{ { 0.5f, 0.5f, 0.0f, 1.0f }}, // 1
-		{ { -0.5f, 0.5f, 0.0f, 1.0f }}, // 2
-		{ { -0.5f, 0.5f, 0.0f, 1.0f }}, // 2
-		{ { -1.0f, 0.0f, 0.0f, 1.0f }}, // 3
-		{ { 0.0f, 0.0f, 0.0f, 1.0f }}, // 0
-
-		{ { 0.0f, 0.0f, 0.0f, 1.0f }}, // 0 - Right
-		{ { 0.0f, 0.0f, -1.2f, 1.0f }}, // 4
-		{ { 0.5f, 0.5f, 0.0f, 1.0f }}, // 1
-		{ { 0.0f, 0.0f, -1.2f, 1.0f }}, // 4
-		{ { 0.5f, 0.5f, -1.2f, 1.0f } }, // 5
-		{ { 0.5f, 0.5f, 0.0f, 1.0f } }, // 1
-
-		{ { 0.5f, 0.5f, 0.0f, 1.0f }}, // 1 - Top
-		{ { 0.5f, 0.5f, -1.2f, 1.0f }}, // 5
-		{ { -0.5f, 0.5f, -1.2f, 1.0f }}, // 6
-		{ { -0.5f, 0.5f, -1.2f, 1.0f } }, // 6
-		{ { -0.5f, 0.5f, 0.0f, 1.0f }}, // 2
-		{ { 0.5f, 0.5f, 0.0f, 1.0f }}, // 1
-
-		{ { -0.5f, 0.5f, 0.0f, 1.0f } }, // 2 - Left
-		{ { -0.5f, 0.5f, -1.2f, 1.0f } }, // 6
-		{ { -1.0f, 0.0f, -1.2f, 1.0f } }, // 7
-		{ { -0.5f, 0.5f, 0.0f, 1.0f }}, // 2
-		{ { -1.0f, 0.0f, -1.2f, 1.0f } }, // 7
-		{ { -1.0f, 0.0f, 0.0f, 1.0f } }, // 3
-
-		{ { -1.0f, 0.0f, 0.0f, 1.0f } }, // 3
-		{ { -1.0f, 0.0f, -1.2f, 1.0f } }, // 7
-		{ { 0.0f, 0.0f, 0.0f, 1.0f } }, // 0
-		{ { 0.0f, 0.0f, 0.0f, 1.0f } }, // 0
-		{ { -1.0f, 0.0f, -1.2f, 1.0f } }, // 7
-		{ { 0.0f, 0.0f, -1.2f, 1.0f } }, // 4
-
-		{ { 0.0f, 0.0f, -1.2f, 1.0f } }, // 4
-		{ { -1.0f, 0.0f, -1.2f, 1.0f } }, // 7
-		{ { -0.5f, 0.5f, -1.2f, 1.0f } }, // 6
-		{ { 0.0f, 0.0f, -1.2f, 1.0f } }, // 4
-		{ { -0.5f, 0.5f, -1.2f, 1.0f } }, // 6
-		{ { 0.5f, 0.5f, -1.2f, 1.0f } }, // 5
-
-	};
-
-	glBindVertexArray(VAO[2]);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(parallVertices), parallVertices, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0); //Vertices
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
-void Application::createBufferObjects() {
-	glGenVertexArrays(3, VAO);
-	glGenBuffers(3, VBO);
-
-	createCubeBuffers();
-	createTriangleBuffers();
-	createParallelogramBuffers();
-
-	checkOpenGlError("ERROR: Could not create VAOs and VBOs.");
-}
-
 void Application::switchProjection() {
 	shader->use();
 	GLuint projLoc = shader->getUniform("ProjectionMatrix");
@@ -461,16 +301,6 @@ void Application::checkOpenGlError(const std::string error) {
 	}
 }
 
-void Application::checkOpenGlInfo() {
-	const GLubyte* renderer = glGetString(GL_RENDERER);
-	const GLubyte* vendor = glGetString(GL_VENDOR);
-	const GLubyte* version = glGetString(GL_VERSION);
-	const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-	std::cerr << "OpenGL Renderer: " << renderer << " (" << vendor << ")" << std::endl;
-	std::cerr << "OpenGL version " << version << std::endl;
-	std::cerr << "GLSL version " << glslVersion << std::endl;
-}
-
 bool Application::isOpenGlError() {
 
 	bool isError = false;
@@ -482,4 +312,14 @@ bool Application::isOpenGlError() {
 	}
 	return isError;
 
+}
+
+void Application::checkOpenGlInfo() {
+	const GLubyte* renderer = glGetString(GL_RENDERER);
+	const GLubyte* vendor = glGetString(GL_VENDOR);
+	const GLubyte* version = glGetString(GL_VERSION);
+	const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+	std::cerr << "OpenGL Renderer: " << renderer << " (" << vendor << ")" << std::endl;
+	std::cerr << "OpenGL version " << version << std::endl;
+	std::cerr << "GLSL version " << glslVersion << std::endl;
 }

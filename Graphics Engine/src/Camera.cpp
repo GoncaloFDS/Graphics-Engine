@@ -14,7 +14,7 @@ Camera::Camera(const Vec3 pos, const Vec3 center) {
 	mouseSensivity = 0.005f;
 	rotationDeltaR = { 0, 0, 0 };
 	rotationDeltaQ = { 0, 0, 0 };
-	viewMatrix = MatrixFactory::Translate(Vec3(0, 0, -15));
+	viewMatrix = MatrixFactory::Translate(pos);
 	zoomDistance = 0;
 	usingQuaternions = false;
 	q = Quat(1, 0, 0, 0);
@@ -73,7 +73,7 @@ Mat4 Camera::getViewMatrix() {
 			MatrixFactory::Rotate(rotationDeltaR.z, Vec3(0, 0, 1)) ;
 		//rotationDeltaR = { 0, 0, 0 };
 
-		viewMatrix = MatrixFactory::Translate(Vec3(0, 0, -10 + zoomDistance)) * r;
+		viewMatrix = MatrixFactory::Translate(Vec3(0, 0, position.z + zoomDistance)) * r;
 
 	}
 	else {
@@ -81,7 +81,7 @@ Mat4 Camera::getViewMatrix() {
 			Quat(rotationDeltaQ.y, Vec4(1, 0, 0, 1)) * 
 			Quat(rotationDeltaQ.z * 50, Vec4(0, 0, 1, 1)) * q;
 		rotationDeltaQ = { 0, 0, 0 };
-		viewMatrix = MatrixFactory::Translate(Vec3(0, 0, -10 + zoomDistance)) * q.GetGLMatrix();
+		viewMatrix = MatrixFactory::Translate(Vec3(0, 0, position.z + zoomDistance)) * q.GetGLMatrix();
 	}
 	
 	return viewMatrix;

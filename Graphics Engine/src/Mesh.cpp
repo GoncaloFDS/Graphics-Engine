@@ -1,5 +1,4 @@
 #include "Mesh.h"
-#include "Application.h"
 
 //////////////////////////////FIXME
 bool isOpenGlError() {
@@ -140,10 +139,6 @@ Mesh::Mesh(std::string& filename) {
 void Mesh::draw(Shader* shader) {
 	glBindVertexArray(VAO);
 	shader->use();
-
-	//glUniformMatrix4fv(ModelMatrix_UId, 1, GL_FALSE, ModelMatrix);
-	//glUniformMatrix4fv(ViewMatrix_UId, 1, GL_FALSE, ViewMatrix1);
-	//glUniformMatrix4fv(ProjectionMatrix_UId, 1, GL_FALSE, ProjectionMatrix2);
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)Vertices.size());
 
 	glUseProgram(0);

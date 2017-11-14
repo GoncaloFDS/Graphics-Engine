@@ -53,10 +53,6 @@ private:
 	void setUpGlew();
 	void setUpOpenGl() const;
 	void createShaderProgram() const;
-	void createCubeBuffers() const;
-	void createTriangleBuffers();
-	void createParallelogramBuffers();
-	void createBufferObjects();
 	static void switchProjection();
 	static void keyUpFunc(unsigned char key, int x, int y);
 	static void processMovement();
