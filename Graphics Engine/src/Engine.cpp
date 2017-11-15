@@ -54,6 +54,87 @@ void Engine::createTangram() {
 
 	sceneWrapper = sceneGraph->createNode();
 
+//	SceneNode* table = sceneWrapper->createNode();
+//	table->setMesh(cube);
+//	table->setMatrix(
+//		MatrixFactory::Translate(Vec3(0, 0, -.2)) *
+//		MatrixFactory::Rotate(-PI / 4, Vec3(0, 0, 1)) *
+//		MatrixFactory::Scale(Vec3(6, 6, 0.1))
+//	);
+//	table->setColor(Vec4(0.38, 0.25, 0.09, 1));
+//
+//	SceneNode* bigTriangle1 = sceneWrapper->createNode();
+//	bigTriangle1->setMesh(triangle);
+//	bigTriangle1->setMatrix(
+//		MatrixFactory::Translate(Vec3(-3, 0, 0)) *
+//		MatrixFactory::Scale(Vec3(0.5, 0.5, 0.3)) 
+//	);
+//	bigTriangle1->setState(Vec3(-3, 0, 0), Quat(-PI / 2, Vec4(0, 0, 1, 1)).Normalize());
+//	bigTriangle1->setColor(Vec4(0.77, 0.37, 0.06, 1));
+//	nodes.push_back(bigTriangle1);
+//
+//	SceneNode* bigTriangle2 = sceneWrapper->createNode();
+//	bigTriangle2->setMesh(triangle);
+//	bigTriangle2->setMatrix(
+//		MatrixFactory::Translate(Vec3(-3.4, 0.15, 0)) *
+//		MatrixFactory::Scale(Vec3(0.5, 0.5, 0.5))
+//	);
+//	bigTriangle2->setState(Vec3(-3.4, 0.15, 0), Quat(5 * PI / 4, Vec4(0, 0, 1, 1)).Normalize());
+//	bigTriangle2->setColor(Vec4(0.1, 0.05, 0.4, 1));
+//	nodes.push_back(bigTriangle2);
+//
+//	SceneNode* parlNode = sceneWrapper->createNode();
+//	parlNode->setMesh(prlgram);
+//	parlNode->setMatrix(
+//		MatrixFactory::Translate(Vec3(-3.45, -0.35, 0)) *
+//		MatrixFactory::Scale(Vec3(0.25, 0.25, 0.25))
+//	);
+//	parlNode->setState(Vec3(-3.45, -0.35, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize());
+//	parlNode->setColor(Vec4(1, 1, 0, 1));
+//	nodes.push_back(parlNode);
+//
+//
+//	SceneNode* mediumTriangle = sceneWrapper->createNode();
+//	mediumTriangle->setMesh(triangle);
+//	mediumTriangle->setMatrix(
+//		MatrixFactory::Translate(Vec3(-2.6, 0.15, 0)) *
+//		MatrixFactory::Scale(Vec3(0.333f, 0.3333f, 0.333f))
+//	);
+//	mediumTriangle->setState(Vec3(-2.6, 0.15, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize());
+//	mediumTriangle->setColor(Vec4(0.62, 0.31, 0.67, 1));
+//	nodes.push_back(mediumTriangle);
+//
+//	SceneNode* smallTriangle1 = sceneWrapper->createNode();
+//	smallTriangle1->setMesh(triangle);
+//	smallTriangle1->setMatrix(
+//		MatrixFactory::Translate(Vec3(-2.9, -0.7, 0)) *
+//		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
+//	);
+//	smallTriangle1->setState(Vec3(-2.9, -0.7, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize());
+//	smallTriangle1->setColor(Vec4(0.24, 0.11, 0.36, 1));
+//	nodes.push_back(smallTriangle1);
+//
+//	SceneNode* cubeNode = sceneWrapper->createNode();
+//	cubeNode->setMesh(cube);
+//	cubeNode->setMatrix(
+//		MatrixFactory::Translate(Vec3(-2.15, 0.1, 0)) *
+//		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
+//	);
+//	cubeNode->setState(Vec3(-2.15, 0.1, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize());
+//	cubeNode->setColor(Vec4(0.24, 0.5, 0.19, 1));
+//	nodes.push_back(cubeNode);
+//
+//
+//	SceneNode* smallTriangle2 = sceneWrapper->createNode();
+//	smallTriangle2->setMesh(triangle);
+//	smallTriangle2->setMatrix(
+//		MatrixFactory::Translate(Vec3(-2.15, -0.25, 0)) *
+//		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
+//	);
+//	smallTriangle2->setState(Vec3(-2.15, -0.25, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize());
+//	smallTriangle2->setColor(Vec4(0.83, 0.11, 0.09, 1));
+//	nodes.push_back(smallTriangle2);
+	
 	SceneNode* table = sceneWrapper->createNode();
 	table->setMesh(cube);
 	table->setMatrix(
@@ -66,32 +147,30 @@ void Engine::createTangram() {
 	SceneNode* bigTriangle1 = sceneWrapper->createNode();
 	bigTriangle1->setMesh(triangle);
 	bigTriangle1->setMatrix(
-		MatrixFactory::Translate(Vec3(-3, 0, 0)) *
-		MatrixFactory::Rotate(-PI / 2, Vec3(0, 0, 1)) *
-		MatrixFactory::Scale(Vec3(0.5, 0.5, 0.3)) 
+		MatrixFactory::Translate(Vec3(3, 0, 0)) *
+		MatrixFactory::Scale(Vec3(0.5, 0.5, 0.3))
 	);
-	bigTriangle1->setState(Vec3(-3, 0, 0), Quat(-PI / 2, Vec4(0, 0, 1, 1)).Normalize());
+	bigTriangle1->setState(Vec3(3, 0, 0), Quat(PI/2, Vec4(0, 0, 1, 1)).Normalize());
 	bigTriangle1->setColor(Vec4(0.77, 0.37, 0.06, 1));
 	nodes.push_back(bigTriangle1);
 
 	SceneNode* bigTriangle2 = sceneWrapper->createNode();
 	bigTriangle2->setMesh(triangle);
 	bigTriangle2->setMatrix(
-		MatrixFactory::Translate(Vec3(-3.4, 0.15, 0)) *
-		MatrixFactory::Rotate(5*PI/4, Vec3(0, 0, 1)) *
-		MatrixFactory::Scale(Vec3(0.5, 0.5, 0.5))
+		MatrixFactory::Translate(Vec3(2.5, -0.5, 0)) *
+		MatrixFactory::Scale(Vec3(0.5, 0.5, 0.25))
 	);
-	bigTriangle2->setState(Vec3(-3.4, 0.15, 0), Quat(5 * PI / 4, Vec4(0, 0, 1, 1)).Normalize());
+	bigTriangle2->setState(Vec3(2.5, -0.5, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize());
 	bigTriangle2->setColor(Vec4(0.1, 0.05, 0.4, 1));
 	nodes.push_back(bigTriangle2);
 
 	SceneNode* parlNode = sceneWrapper->createNode();
 	parlNode->setMesh(prlgram);
 	parlNode->setMatrix(
-		MatrixFactory::Translate(Vec3(-3.45, -0.35, 0)) *
-		MatrixFactory::Scale(Vec3(0.25, 0.25, 0.25))
+		MatrixFactory::Translate(Vec3(2.62, 0.38, 0)) *
+		MatrixFactory::Scale(Vec3(0.25, 0.25, 0.12))
 	);
-	parlNode->setState(Vec3(-3.45, -0.35, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize());
+	parlNode->setState(Vec3(2.62, 0.38, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize());
 	parlNode->setColor(Vec4(1, 1, 0, 1));
 	nodes.push_back(parlNode);
 
@@ -99,32 +178,30 @@ void Engine::createTangram() {
 	SceneNode* mediumTriangle = sceneWrapper->createNode();
 	mediumTriangle->setMesh(triangle);
 	mediumTriangle->setMatrix(
-		MatrixFactory::Translate(Vec3(-2.6, 0.15, 0)) *
-		MatrixFactory::Rotate(-PI / 4, Vec3(0, 0, 1)) *
-		MatrixFactory::Scale(Vec3(0.333f, 0.3333f, 0.333f))
+		MatrixFactory::Translate(Vec3(2.25, 0.25, 0)) *
+		MatrixFactory::Scale(Vec3(0.333f, 0.3333f, 0.2f))
 	);
-	mediumTriangle->setState(Vec3(-2.6, 0.15, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize());
+	mediumTriangle->setState(Vec3(2.25, 0.25, 0), Quat(PI / 4, Vec4(0, 0, 1, 1)).Normalize());
 	mediumTriangle->setColor(Vec4(0.62, 0.31, 0.67, 1));
 	nodes.push_back(mediumTriangle);
 
 	SceneNode* smallTriangle1 = sceneWrapper->createNode();
 	smallTriangle1->setMesh(triangle);
 	smallTriangle1->setMatrix(
-		MatrixFactory::Translate(Vec3(-2.9, -0.7, 0)) *
-		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
+		MatrixFactory::Translate(Vec3(2.5, 0.25, 0)) *
+		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.13f))
 	);
-	smallTriangle1->setState(Vec3(-2.9, -0.7, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize());
+	smallTriangle1->setState(Vec3(2.5, 0.25, 0), Quat(PI, Vec4(0, 0, 1, 1)).Normalize());
 	smallTriangle1->setColor(Vec4(0.24, 0.11, 0.36, 1));
 	nodes.push_back(smallTriangle1);
 
 	SceneNode* cubeNode = sceneWrapper->createNode();
 	cubeNode->setMesh(cube);
 	cubeNode->setMatrix(
-		MatrixFactory::Translate(Vec3(-2.15, 0.1, 0)) *
-		MatrixFactory::Rotate(-PI / 4, Vec3(0, 0, 1)) *
-		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
+		MatrixFactory::Translate(Vec3(2.25, 0, 0)) *
+		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.21f))
 	);
-	cubeNode->setState(Vec3(-2.15, 0.1, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize());
+	cubeNode->setState(Vec3(2.25, 0, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize());
 	cubeNode->setColor(Vec4(0.24, 0.5, 0.19, 1));
 	nodes.push_back(cubeNode);
 
@@ -132,20 +209,27 @@ void Engine::createTangram() {
 	SceneNode* smallTriangle2 = sceneWrapper->createNode();
 	smallTriangle2->setMesh(triangle);
 	smallTriangle2->setMatrix(
-		MatrixFactory::Translate(Vec3(-2.15, -0.25, 0)) *
-		MatrixFactory::Rotate(-PI / 4, Vec3(0, 0, 1)) *
-		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
+		MatrixFactory::Translate(Vec3(2, -0.25, 0)) *
+		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.13f))
 	);
-	smallTriangle2->setState(Vec3(-2.15, -0.25, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize());
+	smallTriangle2->setState(Vec3(2, -0.25, 0), Quat(-PI / 2, Vec4(0, 0, 1, 1)).Normalize());
 	smallTriangle2->setColor(Vec4(0.83, 0.11, 0.09, 1));
 	nodes.push_back(smallTriangle2);
 
 	////////
-	for(SceneNode* node : nodes)
-		startStates.push_back(node->State);
+	//for(SceneNode* node : nodes)
+	//	startStates.push_back(node->State);
+	startStates.push_back(NodeState(Vec3(-3, 0, 0), Quat(-PI / 2, Vec4(0, 0, 1, 1)).Normalize()));
+	startStates.push_back(NodeState(Vec3(-3.4, 0.15, 0), Quat(5 * PI / 4, Vec4(0, 0, 1, 1)).Normalize()));
+	startStates.push_back(NodeState(Vec3(-3.45, -0.35, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize()));
+	startStates.push_back(NodeState(Vec3(-2.6, 0.15, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize()));
+	startStates.push_back(NodeState(Vec3(-2.9, -0.7, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize()));
+	startStates.push_back(NodeState(Vec3(-2.15, 0.1, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize()));
+	startStates.push_back(NodeState(Vec3(-2.15, -0.25, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize()));
+
 	
-	checkpoint1.push_back(NodeState(Vec3(-3, 0, 0.5), Quat(-PI / 2, Vec4(0, 0, 1, 1)).Normalize()));
-	checkpoint1.push_back(NodeState(Vec3(-3.4, 0.15, 1), Quat(5 * PI / 4, Vec4(0, 0, 1, 1)).Normalize()));
+	checkpoint1.push_back(NodeState(Vec3(-3, 0, 0), Quat(-PI / 2, Vec4(0, 0, 1, 1)).Normalize()));
+	checkpoint1.push_back(NodeState(Vec3(-3.4, 0.15, 0.5), Quat(5 * PI / 4, Vec4(0, 0, 1, 1)).Normalize()));
 	checkpoint1.push_back(NodeState(Vec3(-3.45, -0.35, 1.5), Quat(0, Vec4(0, 0, 1, 1)).Normalize()));
 	checkpoint1.push_back(NodeState(Vec3(-2.6, 0.15, 2), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize()));
 	checkpoint1.push_back(NodeState(Vec3(-2.9, -0.7, 2.5), Quat(0, Vec4(0, 0, 1, 1)).Normalize()));
@@ -155,7 +239,7 @@ void Engine::createTangram() {
 
 
 	anim = new Animation(nodes, startStates, checkpoint1, 5.f);
-	anim->start();
+	//anim->start();
 	
 
 }
@@ -281,28 +365,32 @@ void Engine::keyUpFunc(unsigned char key, int x, int y) {
 		else
 			std::cout << "Using Euler Rotation" << std::endl;
 	}
+	if (key == 'l')
+		anim->start();
 }
 
 void Engine::processMovement() {
 	ShaderProgram->use();
 	GLuint viewLoc = ShaderProgram->getUniform("ViewMatrix");
 	if(MovementKeyPressed[0]) {
+		sceneWrapper->transformLocalMatrix(MatrixFactory::Translate(Vec3(-DeltaTime * 3, 0, 0)));
 		MainCamera.moveCamera(movementDir::Left, DeltaTime);
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[1]) {
+		sceneWrapper->transformLocalMatrix(MatrixFactory::Translate(Vec3(DeltaTime * 3, 0, 0)));
 		MainCamera.moveCamera(movementDir::Right, DeltaTime);
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[2]) {
-		sceneWrapper->transformLocalMatrix(MatrixFactory::Translate(Vec3(-DeltaTime * 3, 0, 0)));
-		//MainCamera.moveCamera(movementDir::Forward, DeltaTime);
-		//glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
+		
+		MainCamera.moveCamera(movementDir::Forward, DeltaTime);
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[3]) {
-		sceneWrapper->transformLocalMatrix(MatrixFactory::Translate(Vec3(DeltaTime * 3, 0, 0)));
-		//MainCamera.moveCamera(movementDir::Backward, DeltaTime);
-		//glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
+		
+		MainCamera.moveCamera(movementDir::Backward, DeltaTime);
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[4]) {
 		MainCamera.moveCamera(movementDir::Up, DeltaTime);

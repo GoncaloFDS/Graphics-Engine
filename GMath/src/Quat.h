@@ -32,7 +32,7 @@ public:
 	bool operator==(const Quat q);
 	Quat Inverse();
 
-	static Quat Lerp(const Quat start, const Quat target, float k);
+	static Quat Lerp(Quat start, const Quat target, float k);
 	Quat Slerp(const Quat target, float k);
 };
 

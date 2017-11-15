@@ -76,9 +76,9 @@ Mat4 Camera::getViewMatrix() {
 
 	}
 	else {
-		Q = Quat(RotationDeltaQ.x, Vec4(0, 1, 0, 1)) * 
-			Quat(RotationDeltaQ.y, Vec4(1, 0, 0, 1)) * 
-			Quat(RotationDeltaQ.z * 50, Vec4(0, 0, 1, 1)) * Q;
+		Q = Quat(RotationDeltaQ.x *0.01, Vec4(0, 1, 0, 1)) * 
+			Quat(RotationDeltaQ.y *0.01, Vec4(1, 0, 0, 1)) *
+			Quat(RotationDeltaQ.z, Vec4(0, 0, 1, 1)) * Q;
 		RotationDeltaQ = { 0, 0, 0 };
 		ViewMatrix = MatrixFactory::Translate(Vec3(0, 0, Position.z + ZoomDistance)) * Q.toMatrix();
 	}

@@ -75,7 +75,7 @@ void SceneNode::applyRotation(Quat q) {
 }
 
 void SceneNode::update() {
-	WorldMatrix = Parent->getWorldMatrix() *  LocalMatrix * State.quat.toMatrix();
+	WorldMatrix = Parent->getWorldMatrix() * LocalMatrix * State.quat.toMatrix();
 	//std::cout << State.quat.toMatrix() << std::endl << std::endl;
 	
 	for (SceneNode* node : ChildNodes)
