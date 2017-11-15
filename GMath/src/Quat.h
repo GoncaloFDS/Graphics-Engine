@@ -27,12 +27,12 @@ public:
 	Quat operator*(const Quat q) const;
 	Quat operator*(const float s) const;
 	friend Quat operator*(const float s, const Quat q);
-	Mat4 GetGLMatrix();
+	Mat4 toMatrix();
 
 	bool operator==(const Quat q);
 	Quat Inverse();
 
-	Quat Lerp(const Quat target, float k);
+	static Quat Lerp(const Quat start, const Quat target, float k);
 	Quat Slerp(const Quat target, float k);
 };
 

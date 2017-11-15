@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Mesh.h"
 #include "SceneGraph.h"
+#include "Animation.h"
 
 #define PI (float)3.1415927
 
@@ -11,6 +12,12 @@ Mesh* triangle;
 Mesh* prlgram;
 SceneGraph* sceneGraph;
 SceneNode* sceneWrapper;
+
+std::vector<SceneNode*> nodes;
+std::vector<NodeState> startStates;
+std::vector<NodeState> endStates;
+
+Animation* anim;
 
 int Engine::WindowHandle;
 int Engine::FrameCount;
@@ -104,6 +111,7 @@ void Engine::createTangram() {
 		MatrixFactory::Rotate(-PI / 4, Vec3(0, 0, 1)) *
 		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
 	);
+	cubeNode->setState(Vec3(-2.15, 0.1, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize());
 	cubeNode->setColor(Vec4(0.24, 0.5, 0.19, 1));
 
 
@@ -115,7 +123,14 @@ void Engine::createTangram() {
 		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
 	);
 	smallTriangle2->setColor(Vec4(0.83, 0.11, 0.09, 1));
-
+	////////
+	nodes.push_back(cubeNode);
+	startStates.push_back(cubeNode->State);
+	
+	endStates.push_back(NodeState(Vec3(-2.15, 0.1, 2), Quat(0, Vec4(0, 0, 1, 1)).Normalize()));
+	anim = new Animation(nodes, startStates, endStates, 5.f);
+	anim->start();
+	
 
 }
 
@@ -178,6 +193,7 @@ void Engine::drawScene() {
 void Engine::display() {
 	++FrameCount;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	anim->play(DeltaTime);
 	drawScene();
 	glutSwapBuffers();
 }
@@ -247,22 +263,25 @@ void Engine::processMovement() {
 	ShaderProgram->use();
 	GLuint viewLoc = ShaderProgram->getUniform("ViewMatrix");
 	if(MovementKeyPressed[0]) {
-		sceneWrapper->transformLocalMatrix(MatrixFactory::Translate(Vec3(-DeltaTime * 3, 0, 0)));
-		MainCamera.moveCamera(movementDir::Left, DeltaTime);
-		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
+		sceneWrapper->applyRotation(Quat(15*DeltaTime, Vec4(0, 0, 1, 1)));
+	/*	MainCamera.moveCamera(movementDir::Left, DeltaTime);
+		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);*/
 	}
 	if(MovementKeyPressed[1]) {
-		sceneWrapper->transformLocalMatrix(MatrixFactory::Translate(Vec3(DeltaTime * 3, 0, 0)));
+		sceneWrapper->applyRotation(Quat(-15*DeltaTime, Vec4(0, 0, 1, 1)));
 		/*MainCamera.moveCamera(movementDir::Right, DeltaTime);
 		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);*/
 	}
 	if(MovementKeyPressed[2]) {
-		MainCamera.moveCamera(movementDir::Forward, DeltaTime);
-		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
+		sceneWrapper->transformLocalMatrix(MatrixFactory::Translate(Vec3(-DeltaTime * 3, 0, 0)));
+
+		//MainCamera.moveCamera(movementDir::Forward, DeltaTime);
+		//glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[3]) {
-		MainCamera.moveCamera(movementDir::Backward, DeltaTime);
-		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
+		sceneWrapper->transformLocalMatrix(MatrixFactory::Translate(Vec3(DeltaTime * 3, 0, 0)));
+		//MainCamera.moveCamera(movementDir::Backward, DeltaTime);
+		//glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[4]) {
 		MainCamera.moveCamera(movementDir::Up, DeltaTime);

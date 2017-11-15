@@ -1,14 +1,16 @@
 #include "SceneNode.h"
 #include "MatrixFactory.h"
 #include "Vec4.h"
+#include "Quat.h"
 
-SceneNode::SceneNode() : ModelUniform(-1), ColorUniform(-1) {
+SceneNode::SceneNode() : ModelUniform(-1), ColorUniform(-1), State(Vec3(0, 0, 0), Quat(0, Vec4(0, 0, 1, 1))) {
 	//sanity check
 	Parent = nullptr;
 	LocalMatrix = MatrixFactory::Identity();
 	WorldMatrix = MatrixFactory::Identity();
 	NodeMesh = nullptr;
 	ShaderProg = nullptr;
+
 }
 
 SceneNode* SceneNode::createNode() {
@@ -24,6 +26,11 @@ void SceneNode::setMesh(Mesh* mesh) {
 
 void SceneNode::setMatrix(Mat4 m) {
 	LocalMatrix = m;
+}
+
+void SceneNode::setState(const Vec3 pos, Quat quat) {
+	State.position = pos;
+	State.quat = quat;
 }
 
 void SceneNode::transformLocalMatrix(Mat4 m) {
@@ -54,12 +61,23 @@ Mat4 SceneNode::getWorldMatrix() const {
 	return WorldMatrix;
 }
 
-void SceneNode::setColor(Vec4 c) {
+void SceneNode::setColor(const Vec4 c) {
 	Color = c;
 }
 
+void SceneNode::applyTranslation(Vec3 t) {
+	LocalMatrix = MatrixFactory::Translate(t) * LocalMatrix;
+	State.position += t;
+}
+
+void SceneNode::applyRotation(Quat q) {
+	State.quat = q;
+}
+
 void SceneNode::update() {
-	WorldMatrix = Parent->getWorldMatrix() * LocalMatrix;
+	WorldMatrix = Parent->getWorldMatrix() *  LocalMatrix * State.quat.toMatrix();
+	//std::cout << State.quat.toMatrix() << std::endl << std::endl;
+	
 	for (SceneNode* node : ChildNodes)
 		node->update();
 }

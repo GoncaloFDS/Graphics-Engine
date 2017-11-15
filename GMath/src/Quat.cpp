@@ -5,7 +5,7 @@ Quat::Quat(float t_, float x_, float y_, float z_) : t(t_), x(x_), y(y_), z(z_)
 
 Quat::Quat(float theta, Vec4 axis) {
 	axis.Normalize();
-	float a = theta * DEGREES_TO_RADIANS;
+	float a = theta;
 	t = cos(a / 2.0f);
 	float s = sin(a / 2.0f);
 	x = axis.x * s;
@@ -87,7 +87,7 @@ Quat Quat::operator*(const float s) const {
 	return Quat{ t*s, x*s, y*s, z*s };
 }
 
-Mat4 Quat::GetGLMatrix() {
+Mat4 Quat::toMatrix() {
 	Normalize();
 	float xx = x * x;
 	float xy = x * y;
@@ -118,11 +118,11 @@ Quat Quat::Inverse() {
 	return Conjugate() * (1.0f / Quadrance());
 }
 
-Quat Quat::Lerp(const Quat target, float k) {
-	float cos_angle = x*target.x + y*target.y + z*target.z + t*target.t;
+Quat Quat::Lerp(const Quat start, const Quat target, float k) {
+	float cos_angle = target.x*start.x + target.y*start.y + target.z*start.z + target.t*start.t;
 	float k0 = 1.0f - k;
 	float k1 = (cos_angle > 0) ? k : -k;
-	Quat qi = (*this)*k0 + target*k1;
+	Quat qi = target*k0 + start*k1;
 	qi.Normalize();
 	return qi;
 }
