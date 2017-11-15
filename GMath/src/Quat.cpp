@@ -119,8 +119,6 @@ Quat Quat::Inverse() {
 }
 
 Quat Quat::Lerp(Quat start, const Quat target, float k) {
-	if (start == target)
-		return start;
 	float cos_angle = target.x*start.x + target.y*start.y + target.z*start.z + target.t*start.t;
 	float k0 = 1.0f - k;
 	float k1 = (cos_angle > 0) ? k : -k;

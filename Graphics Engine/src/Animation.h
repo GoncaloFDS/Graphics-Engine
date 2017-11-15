@@ -7,11 +7,11 @@ class Animation {
 	std::vector<NodeState> StartStates;
 	std::vector<NodeState> EndStates;
 	bool IsActive;
-	bool HasEnded;
 	float Duration;
 	float currentTime;
 
 public:
+	bool HasEnded;
 	Animation(std::vector<SceneNode*> ns, std::vector<NodeState> start, 
 		std::vector<NodeState> end, float duration);
 	void play(float deltaTime);

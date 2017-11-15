@@ -7,6 +7,7 @@ Animation::Animation(std::vector<SceneNode*> ns, std::vector<NodeState> start,
 	StartStates = start;
 	EndStates = end;
 	Duration = duration;
+	HasEnded = false;
 }
 
 void Animation::play(const float deltaTime) {
@@ -16,13 +17,15 @@ void Animation::play(const float deltaTime) {
 				(EndStates[i].position - StartStates[i].position);
 			Nodes[i]->applyTranslation(t);
 
-			Quat lerped = Quat::Lerp(StartStates[i].quat, EndStates[i].quat, currentTime / Duration).Normalize();
+			Quat lerped = Quat::Lerp(StartStates[i].quat, EndStates[i].quat, 1 - currentTime / Duration).Normalize();
 
 			Nodes[i]->applyRotation(lerped);
 			
 		}
 		currentTime += deltaTime;
 	}
+	if (currentTime > Duration)
+		HasEnded = true;
 }
 
 void Animation::start() {
