@@ -38,38 +38,42 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
 	glCompileShader(fragment);
 	checkCompileErrors(fragment, Fragment);
 
-	ID = glCreateProgram();
-	glAttachShader(ID, vertex);
-	glAttachShader(ID, fragment);
-	glLinkProgram(ID);
-	checkCompileErrors(ID, Program);
+	Id = glCreateProgram();
+	glAttachShader(Id, vertex);
+	glAttachShader(Id, fragment);
+	glLinkProgram(Id);
+	checkCompileErrors(Id, Program);
 	// delete the shaders as they're linked into our program now and no longer necessary
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
 }
 
 Shader::~Shader() {
-	glDeleteProgram(ID);
+	glDeleteProgram(Id);
 }
 
 void Shader::use() const {
-	glUseProgram(ID);
+	glUseProgram(Id);
+}
+
+void Shader::detach() {
+	glUseProgram(0);
 }
 
 GLint Shader::getUniform(const char* uniformName) const {
-	return glGetUniformLocation(ID, uniformName);
+	return glGetUniformLocation(Id, uniformName);
 }
 
 GLuint Shader::bindAttribute(const char* attributeName) {
 	// Add the attribute location value for the attributeName key
-	attributeMap[attributeName] = glGetAttribLocation(ID, attributeName);
+	AttributeMap[attributeName] = glGetAttribLocation(Id, attributeName);
 
-	// Check to ensure that the shader contains an attribute with this name
-	if (attributeMap[attributeName] == -1) {
+	// Check to ensure that the ShaderProgram contains an attribute with this name
+	if (AttributeMap[attributeName] == -1) {
 		std::cout << "Could not add attribute: " << attributeName;
 	}
 	// Return the attribute location
-	return attributeMap[attributeName];
+	return AttributeMap[attributeName];
 }
 
 

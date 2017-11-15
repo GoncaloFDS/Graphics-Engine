@@ -16,24 +16,24 @@ enum Projection {
 	Ortho, Perspective
 };
 
-class Application {
+class Engine {
 public:
-	Application(int argc, char* argv[], Vec2 win);
+	Engine(int argc, char* argv[], Vec2 win);
 
 private:
-	static int windowHandle;
-	static int frameCount;
-	static Vec2 win_;
-	static std::string caption;
-	static Shader* shader;
-	static Projection projectionType;
-	static GLuint VAO[3], VBO[3];
-	static Camera camera;
-	static int oldTime;
-	static float deltaTime;
-	static bool movementKeyPressed[6];
+	static int WindowHandle;
+	static int FrameCount;
+	static Vec2 WindowSize;
+	static std::string Caption;
+	static Shader* ShaderProgram;
+	static Projection ProjectionType;
+	static Camera MainCamera;
+	static int OldTime;
+	static float DeltaTime;
+	static bool MovementKeyPressed[6];
 	
 	static void createSceneMatrices();
+	static void createTangram();
 
 	static bool isOpenGlError();
 	static void checkOpenGlError(std::string error);

@@ -21,7 +21,7 @@ class Mesh {
 	bool TexcoordsLoaded = false;
 	bool NormalsLoaded = false;
 
-	GLuint VAO, EBO;
+	GLuint Vao, Ebo;
 	GLuint VboVertices, VboTexcoords, VboNormals;
 
 

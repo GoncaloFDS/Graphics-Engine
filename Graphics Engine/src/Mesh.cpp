@@ -99,8 +99,8 @@ void Mesh::parseLine(std::stringstream& sin) {
 }
 
 void Mesh::createBuffers() {
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	glGenVertexArrays(1, &Vao);
+	glBindVertexArray(Vao);
 	{
 		glGenBuffers(1, &VboVertices);
 		glBindBuffer(GL_ARRAY_BUFFER, VboVertices);
@@ -137,7 +137,7 @@ Mesh::Mesh(std::string& filename) {
 }
 
 void Mesh::draw(Shader* shader) {
-	glBindVertexArray(VAO);
+	glBindVertexArray(Vao);
 	shader->use();
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)Vertices.size());
 

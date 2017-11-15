@@ -8800,7 +8800,7 @@ namespace Catch {
             info.kp_proc.p_flag = 0;
 
             // Initialize mib, which tells sysctl the info we want, in this case
-            // we're looking for information about a specific process ID.
+            // we're looking for information about a specific process Id.
 
             mib[0] = CTL_KERN;
             mib[1] = KERN_PROC;

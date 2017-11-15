@@ -2,7 +2,7 @@
 #include "MatrixFactory.h"
 #include "Vec4.h"
 
-SceneNode::SceneNode() {
+SceneNode::SceneNode() : ModelUniform(-1), ColorUniform(-1) {
 	//sanity check
 	Parent = nullptr;
 	LocalMatrix = MatrixFactory::Identity();
@@ -26,30 +26,40 @@ void SceneNode::setMatrix(Mat4 m) {
 	LocalMatrix = m;
 }
 
+void SceneNode::transformLocalMatrix(Mat4 m) {
+	LocalMatrix = m * LocalMatrix;
+}
+
 void SceneNode::setParent(SceneNode* parent) {
 	Parent = parent;
 }
 
-SceneNode * SceneNode::getParent() {
+SceneNode * SceneNode::getParent() const {
 	return Parent;
 }
 
 void SceneNode::setShader(Shader* s) {
 	ShaderProg = s;
+	ShaderProg->use();
+	ModelUniform = ShaderProg->getUniform("ModelMatrix");
+	ColorUniform = ShaderProg->getUniform("Color");
+	ShaderProg->detach();
 }
 
-Shader* SceneNode::getShader() {
+Shader* SceneNode::getShader() const {
 	return ShaderProg;
 }
 
-Mat4 SceneNode::getWorldMatrix() {
+Mat4 SceneNode::getWorldMatrix() const {
 	return WorldMatrix;
+}
+
+void SceneNode::setColor(Vec4 c) {
+	Color = c;
 }
 
 void SceneNode::update() {
 	WorldMatrix = Parent->getWorldMatrix() * LocalMatrix;
-	
-
 	for (SceneNode* node : ChildNodes)
 		node->update();
 }
@@ -59,13 +69,15 @@ void SceneNode::draw() {
 	while (ShaderProg == nullptr) {
 		ShaderProg = currentParent->getShader();
 		currentParent = currentParent->getParent();
+		ModelUniform = ShaderProg->getUniform("ModelMatrix");
+		ColorUniform = ShaderProg->getUniform("Color");
 	}
-	ShaderProg->use();
-	GLint modelUniform = ShaderProg->getUniform("ModelMatrix");
-	GLint colorUniform = ShaderProg->getUniform("Color");
-	glUniformMatrix4fv(modelUniform, 1, GL_TRUE, WorldMatrix.entry);
-	glUniform4fv(colorUniform, 1, Vec4(0.7, 0.4, 0.3, 1).asArray());
-	NodeMesh->draw(ShaderProg);
+	if (NodeMesh != nullptr) {
+		ShaderProg->use();
+		glUniformMatrix4fv(ModelUniform, 1, GL_TRUE, WorldMatrix.entry);
+		glUniform4fv(ColorUniform, 1, Color.asArray());
+		NodeMesh->draw(ShaderProg);
+	}
 	for (SceneNode* node : ChildNodes)
 		node->draw();
 }

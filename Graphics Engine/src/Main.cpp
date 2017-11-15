@@ -5,10 +5,10 @@
 #include "GL/glew.h"
 #include "GL/freeglut.h"
 #include "Vec2.h"
-#include "Application.h"
+#include "Engine.h"
 
 void init(int argc, char* argv[]) {
-	Application app(argc, argv, Vec2(700, 700));
+	Engine app(argc, argv, Vec2(640, 480));
 
 }
 

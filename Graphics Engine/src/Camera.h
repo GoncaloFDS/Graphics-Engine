@@ -17,25 +17,25 @@ enum movementDir {
 
 class Camera {
 private:
-	float movementSpeed;
-	float mouseSensivity;
+	float MovementSpeed;
+	float MouseSensivity;
 
-	Vec2 lastMouse;
-	bool leftButtonPressed = false;
-	bool firstMouseInput = true;
-	Vec3 rotationDeltaR;
-	float zoomDistance;
-	Quat q;
-	Mat4 r;
-	Vec3 rotationDeltaQ;
+	Vec2 LastMouse;
+	bool LeftButtonPressed = false;
+	bool FirstMouseInput = true;
+	Vec3 RotationRodrigues;
+	float ZoomDistance;
+	Quat Q;
+	Mat4 R;
+	Vec3 RotationDeltaQ;
 
 public:
 	Camera() = default;
 	Camera(Vec3 pos, Vec3 center);
 	~Camera() = default;
-	Vec3 position;
-	Mat4 viewMatrix;
-	bool usingQuaternions;
+	Vec3 Position;
+	Mat4 ViewMatrix;
+	bool UsingQuaternions;
 
 	void setLeftButton(bool b);
 	void setIsFirstMouseInput(bool b);

@@ -1,5 +1,4 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include <GL/glew.h>
 
@@ -12,9 +11,8 @@
 
 class Shader {
 public:
-	// the program ID
-	GLuint ID;
-	std::map<std::string, int> attributeMap;
+	GLuint Id;
+	std::map<std::string, int> AttributeMap;
 
 	enum Type {
 		Program,
@@ -22,16 +20,15 @@ public:
 		Fragment
 	};
 
-	// constructor reads and builds the shader
+	// constructor reads and builds the ShaderProgram
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
 	~Shader();
 
 	void use() const;
+	void detach();
 	GLint getUniform(const char* str) const;
 	GLuint bindAttribute(const char* attrbName);
 
 private:
 	void checkCompileErrors(const GLuint shader, const Type type) const;
 };
-
-#endif
