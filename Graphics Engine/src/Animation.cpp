@@ -9,56 +9,27 @@ Animation::Animation(std::vector<SceneNode*> ns, std::vector<NodeState> start,
 	Duration = duration;
 }
 
-void Animation::play(const float deltaTime) {
-	if(IsActive && currentTime < Duration) {
+//returns true if animatin has ended
+bool Animation::play(const float deltaTime) {
+	if(CurrentTime < Duration) {
 		for(int i = 0; i < Nodes.size(); i++) {
-			Vec3 t = (deltaTime / Duration) * 
-				(EndStates[i].position - StartStates[i].position);
+			Vec3 t = (deltaTime / Duration) * (EndStates[i].position - StartStates[i].position);
 			Nodes[i]->applyTranslation(t);
-
-			Quat lerped = Quat::Lerp(StartStates[i].quat, EndStates[i].quat, 1 - currentTime / Duration).Normalize();
-
-			Nodes[i]->applyRotation(lerped);
+			Quat start = StartStates[i].quat;
+			Quat target = EndStates[i].quat;
+			if(start != target)
+				Nodes[i]->applyRotation(Quat::slerp(start, target, CurrentTime / Duration).normalize());
 			
 		}
-		currentTime += deltaTime;
+		CurrentTime += deltaTime;
+		return false;
 	}
-	if (currentTime > Duration) {
-		if(Next != nullptr)
-			Next->start();
-	}
-}
-
-bool Animation::isActive() {
-	return IsActive;
-}
-
-void Animation::start() {
-	IsActive = true;
-}
-
-void Animation::stop() {
-	IsActive = false;
+	return true;
 }
 
 void Animation::reverse() {
-	currentTime = Duration - currentTime;
+	CurrentTime = Duration - CurrentTime;
 	const std::vector<NodeState> tempState = StartStates;
 	StartStates = EndStates;
 	EndStates = tempState;
-	Animation* tempAnim = Previous;
-	Previous = Next;
-	Next = tempAnim;
-}
-
-void Animation::setPreviousAnimation(Animation* anim) {
-	Previous = anim;
-}
-
-void Animation::setNextAnimation(Animation* anim) {
-	Next = anim;
-}
-
-bool Animation::hasEnded() const {
-	return Next == nullptr;
 }

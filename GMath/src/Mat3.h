@@ -18,9 +18,9 @@ struct Mat3 {
 	Mat3(const Mat4& m);
 	bool operator==(Mat3& other) const;
 	bool operator!=(Mat3& other) const;
-	void Clean();
+	void clean();
 
-	float Get(int i, int j);
+	float get(int i, int j);
 	friend std::ostream& operator<<(std::ostream& os, const Mat3& m);
 
 	float Determinant();

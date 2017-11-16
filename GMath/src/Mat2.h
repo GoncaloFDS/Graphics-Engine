@@ -17,14 +17,14 @@ struct Mat2 {
 
 	float Get(int i, int j);
 
-	static Mat2 Identity();
-	static Mat2 Rotate(float angle);
-	static Mat2 Scale(const Vec2& s);
+	static Mat2 identity();
+	static Mat2 rotate(float angle);
+	static Mat2 scale(const Vec2& s);
 
-	static Mat2 Transpose(const Mat2& matrix);
-	static Mat2 Inverse(Mat2& matrix);
+	static Mat2 transpose(const Mat2& matrix);
+	static Mat2 inverse(Mat2& matrix);
 
-	float Determinant();
+	float determinant();
 
 	friend Mat2 operator*(Mat2 left, const Mat2& right);
 	Mat2 operator*=(const Mat2& other);

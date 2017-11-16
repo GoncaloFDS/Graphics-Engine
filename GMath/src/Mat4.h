@@ -17,15 +17,15 @@ struct Mat4 {
 	Mat4(float diagonal);
 	Mat4(const Mat3& m);
 	~Mat4();
-	Mat4 RowMajor();
+	Mat4 rowMajor() const;
 
-	float Get(int i, int j);
+	float get(int i, int j);
 	friend std::ostream& operator<<(std::ostream& os, const Mat4& m);
 	
 	bool operator==(Mat4& other) const;
 	bool operator!=(Mat4& other) const;
 
-	void Clean();
+	void clean();
 
 	friend Mat4 operator*(Mat4 left, const Mat4& right);
 	Mat4& operator*=(const Mat4& other);
@@ -38,7 +38,7 @@ struct Mat4 {
 
 	friend Vec3 operator*(const Mat4& left, const Vec3& right);
 
-	float Determinant();
+	float determinant();
 
 	friend Mat4 operator*(const Mat4 left, const float scalar);
 	Mat4 operator*=(const float scalar);

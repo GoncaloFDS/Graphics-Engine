@@ -4,15 +4,23 @@ void Animator::addAnimation(Animation* a) {
 	Animations.push_back(a);
 }
 
-void Animator::play(float deltaTime) {
-	Animations[CurrentIdx]->play(deltaTime);
+void Animator::play(const float deltaTime) {
+	if(IsActive && Animations[CurrentIdx]->play(deltaTime)) {
+		if (IsInverted && CurrentIdx != 0)
+			CurrentIdx--;
+		else if(!IsInverted && CurrentIdx < Animations.size()-1)
+			CurrentIdx++;
+	}
 }
 
-void Animator::start() {
-}
-
-void Animator::stop() {
+void Animator::toggle() {
+	IsActive = !IsActive;
 }
 
 void Animator::reverse() {
+	
+		IsInverted = !IsInverted;
+		for (Animation* a : Animations)
+			a->reverse();
+	
 }

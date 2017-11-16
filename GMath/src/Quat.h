@@ -15,12 +15,12 @@ public:
 
 	Quat(float t, float x, float y, float z);
 	Quat(float theta, Vec4 axis);
-	const void Clean();
-	Quat Normalize() const;
-	const void ToAngleAxis(float& theta, Vec4& axis);
-	const float Quadrance() const;
-	const float Magnitude() const;
-	const Quat Conjugate() const;
+	void clean();
+	Quat normalize() const;
+	const void toAngleAxis(float& theta, Vec4& axis) const;
+	const float quadrance() const;
+	float magnitude() const;
+	const Quat conjugate() const;
 
 	Quat operator+(const Quat q) const;
 	Quat operator-(const Quat q) const;
@@ -29,10 +29,11 @@ public:
 	friend Quat operator*(const float s, const Quat q);
 	Mat4 toMatrix();
 
-	bool operator==(const Quat q);
-	Quat Inverse();
+	bool operator==(const Quat q) const;
+	bool operator!=(const Quat q) const;
+	Quat inverse() const;
 
-	static Quat Lerp(Quat start, const Quat target, float k);
-	Quat Slerp(const Quat target, float k);
+	static Quat lerp(Quat start, const Quat target, float k);
+	static Quat slerp(const Quat start, const Quat target, float k);
 };
 

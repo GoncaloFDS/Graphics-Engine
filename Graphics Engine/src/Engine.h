@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Vec4.h"
 #include "Camera.h"
+#include "SceneNode.h"
 
 typedef struct {
 	GLfloat XYZW[4];
@@ -33,6 +34,7 @@ private:
 	static bool MovementKeyPressed[8];
 	
 	static void createSceneMatrices();
+	static void createAnimations(std::vector<SceneNode*> nodes);
 	static void createTangram();
 
 	static bool isOpenGlError();

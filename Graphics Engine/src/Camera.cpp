@@ -14,11 +14,11 @@ Camera::Camera(const Vec3 pos, const Vec3 center) {
 	MouseSensivity = 0.005f;
 	RotationRodrigues = { 0, 0, 0 };
 	RotationDeltaQ = { 0, 0, 0 };
-	ViewMatrix = MatrixFactory::Translate(pos);
+	ViewMatrix = MatrixFactory::translate(pos);
 	ZoomDistance = 0;
 	UsingQuaternions = false;
 	Q = Quat(1, 0, 0, 0);
-	R = MatrixFactory::Identity();
+	R = MatrixFactory::identity();
 }
 
 
@@ -68,11 +68,11 @@ void Camera::moveMouse(int x, int y, Vec2 screen) {
 
 Mat4 Camera::getViewMatrix() {
 	if(!UsingQuaternions) {
-		R = MatrixFactory::Rotate(RotationRodrigues.x, Vec3(0, 1, 0)) *
-			MatrixFactory::Rotate(RotationRodrigues.y, Vec3(1, 0, 0)) *
-			MatrixFactory::Rotate(RotationRodrigues.z, Vec3(0, 0, 1)) ;
+		R = MatrixFactory::rotate(RotationRodrigues.x, Vec3(0, 1, 0)) *
+			MatrixFactory::rotate(RotationRodrigues.y, Vec3(1, 0, 0)) *
+			MatrixFactory::rotate(RotationRodrigues.z, Vec3(0, 0, 1)) ;
 
-		ViewMatrix = MatrixFactory::Translate(Vec3(0, 0, Position.z + ZoomDistance)) * R;
+		ViewMatrix = MatrixFactory::translate(Vec3(0, 0, Position.z + ZoomDistance)) * R;
 
 	}
 	else {
@@ -80,7 +80,7 @@ Mat4 Camera::getViewMatrix() {
 			Quat(RotationDeltaQ.y *0.01, Vec4(1, 0, 0, 1)) *
 			Quat(RotationDeltaQ.z, Vec4(0, 0, 1, 1)) * Q;
 		RotationDeltaQ = { 0, 0, 0 };
-		ViewMatrix = MatrixFactory::Translate(Vec3(0, 0, Position.z + ZoomDistance)) * Q.toMatrix();
+		ViewMatrix = MatrixFactory::translate(Vec3(0, 0, Position.z + ZoomDistance)) * Q.toMatrix();
 	}
 	
 	return ViewMatrix;

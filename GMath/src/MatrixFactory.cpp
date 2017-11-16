@@ -5,11 +5,11 @@ MatrixFactory::MatrixFactory() {
 
 MatrixFactory::~MatrixFactory() = default;
 
-Mat4 MatrixFactory::Identity() {
+Mat4 MatrixFactory::identity() {
 	return Mat4(1.f);
 }
 
-Mat4 MatrixFactory::Translate(const Vec3& t) {
+Mat4 MatrixFactory::translate(const Vec3& t) {
 	return Mat4{
 		1, 0, 0, t.x,
 		0, 1, 0, t.y,
@@ -18,13 +18,13 @@ Mat4 MatrixFactory::Translate(const Vec3& t) {
 	};
 }
 
-Mat4 MatrixFactory::Rotate(const float angle, Vec3 axis) {
+Mat4 MatrixFactory::rotate(const float angle, Vec3 axis) {
 	axis.Normalize();
-	return Mat4(1.0f) + sin(angle) * CrossMatrix(axis)
-		+ (1 - cos(angle)) * SqrCrossMatrix(axis);
+	return Mat4(1.0f) + sin(angle) * crossMatrix(axis)
+		+ (1 - cos(angle)) * sqrCrossMatrix(axis);
 }
 
-Mat4 MatrixFactory::Scale(const Vec3& s) {
+Mat4 MatrixFactory::scale(const Vec3& s) {
 	return Mat4 {
 		s.x, 0, 0, 0,
 		0, s.y, 0, 0,
@@ -33,7 +33,7 @@ Mat4 MatrixFactory::Scale(const Vec3& s) {
 	};
 }
 
-Mat4 MatrixFactory::Transpose(const Mat4& m) {
+Mat4 MatrixFactory::transpose(const Mat4& m) {
 	return Mat4 {
 		m.entry[0], m.entry[4], m.entry[8], m.entry[12],
 		m.entry[1], m.entry[5], m.entry[9], m.entry[13],
@@ -42,7 +42,7 @@ Mat4 MatrixFactory::Transpose(const Mat4& m) {
 	};
 }
 
-Mat4 MatrixFactory::CrossMatrix(const Vec3& k) {
+Mat4 MatrixFactory::crossMatrix(const Vec3& k) {
 	return Mat4 {
 		0, -k.z, k.y, 0,
 		k.z, 0, -k.x, 0,
@@ -51,7 +51,7 @@ Mat4 MatrixFactory::CrossMatrix(const Vec3& k) {
 	};
 }
 
-Mat4 MatrixFactory::SqrCrossMatrix(const Vec3& k) {
+Mat4 MatrixFactory::sqrCrossMatrix(const Vec3& k) {
 	return Mat4 {
 		-(k.z * k.z) - (k.y * k.y), k.x * k.y, k.x * k.z, 0,
 		k.x * k.y, -(k.z * k.z) - (k.x * k.x), k.y * k.z, 0,
@@ -60,7 +60,7 @@ Mat4 MatrixFactory::SqrCrossMatrix(const Vec3& k) {
 	};
 }
 
-Mat4 MatrixFactory::Ortho(const float l, const float r, const float t, const float b, const float n, const float f) {
+Mat4 MatrixFactory::ortho(const float l, const float r, const float t, const float b, const float n, const float f) {
 	return Mat4 {
 		2.f / (r - l), 0, 0, (l + r) / (l - r),
 		0, 2.f / (t - b), 0, (b + t) / (b - t),
@@ -69,7 +69,7 @@ Mat4 MatrixFactory::Ortho(const float l, const float r, const float t, const flo
 	};
 }
 
-Mat4 MatrixFactory::Perspective(const float fov, const float ratio, const float n, const float f) {
+Mat4 MatrixFactory::perspective(const float fov, const float ratio, const float n, const float f) {
 	const float d = 1.f / tan(fov / 2.f);
 	return Mat4 {
 		d / ratio, 0, 0, 0,
@@ -79,7 +79,7 @@ Mat4 MatrixFactory::Perspective(const float fov, const float ratio, const float 
 	};
 }
 
-Mat4 MatrixFactory::LookAt(const Vec3 eye, const Vec3 center, const Vec3 up) {
+Mat4 MatrixFactory::lookAt(const Vec3 eye, const Vec3 center, const Vec3 up) {
 	Vec3 v = center - eye;
 	v.Normalize();
 	Vec3 s = v.Cross(up);

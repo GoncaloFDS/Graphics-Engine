@@ -41,7 +41,7 @@ Mat4::Mat4(const float e[16]) {
 		entry[i] = e[i];
 }
 
-float Mat4::Get(int i, int j) {
+float Mat4::get(int i, int j) {
 	return entry[i * 4 + j];
 }
 
@@ -65,7 +65,7 @@ bool Mat4::operator!=(Mat4& other) const {
 	return !(*this == other);
 }
 
-void Mat4::Clean() {
+void Mat4::clean() {
 	for (int i = 0; i < 16; i++)
 		if (fabs(entry[i]) < CloseTozero)
 			entry[i] = 0.f;
@@ -139,7 +139,7 @@ Mat4 operator*(const Mat4 left, const float scalar) {
 }
 
 
-float Mat4::Determinant() {
+float Mat4::determinant() {
 	float temp[16];
 
 	temp[0] = entry[5] * entry[10] * entry[15] -
@@ -189,7 +189,7 @@ Mat4 Mat4::operator*=(const float scalar) {
 
 Mat4::~Mat4() = default;
 
-Mat4 Mat4::RowMajor() {
-	return MatrixFactory::Transpose(Mat4(*this));
+Mat4 Mat4::rowMajor() const {
+	return MatrixFactory::transpose(Mat4(*this));
 }
 

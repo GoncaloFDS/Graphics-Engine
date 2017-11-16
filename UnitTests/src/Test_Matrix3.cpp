@@ -29,7 +29,7 @@ TEST_CASE("Matrix Factory") {
 			1, 0, 0,
 			0, 1, 0 };
 		Vec3 v{ 1, 1, 1 };
-		Mat3 m = MatrixFactory::Rotate(2.f * PI / 3.f, v);
+		Mat3 m = MatrixFactory::rotate(2.f * PI / 3.f, v);
 		CHECK(rot == m);
 
 	}
@@ -39,7 +39,7 @@ TEST_CASE("Matrix Factory") {
 			2, 0, 0,
 			0, 3, 0,
 			0, 0, 1 };
-		Mat3 s = MatrixFactory::Scale(Vec3{ 2, 3, 1 });
+		Mat3 s = MatrixFactory::scale(Vec3{ 2, 3, 1 });
 		CHECK(i == s);
 	}
 

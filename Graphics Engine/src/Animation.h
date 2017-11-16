@@ -1,28 +1,20 @@
 #pragma once
 #include <vector>
-#include "SceneNode.h";
+#include "SceneNode.h"
 
 class Animation {
 	std::vector<SceneNode*> Nodes;
 	std::vector<NodeState> StartStates;
 	std::vector<NodeState> EndStates;
-	bool IsActive;
 	float Duration;
-	float currentTime;
-	Animation* Previous = nullptr;
-	Animation* Next = nullptr;
+	float CurrentTime;
 
 public:
 	Animation(std::vector<SceneNode*> ns, std::vector<NodeState> start, 
 		std::vector<NodeState> end, float duration);
-	void play(float deltaTime);
-	bool isActive();
-	void start();
-	void stop();
+	bool play(float deltaTime);
 	void reverse();
-	void setPreviousAnimation(Animation* anim);
-	void setNextAnimation(Animation* anim);
-	bool hasEnded() const;
+
 };
 
 

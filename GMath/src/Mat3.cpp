@@ -50,13 +50,13 @@ std::ostream& operator<<(std::ostream& os, const Mat3& m) {
 	return os;
 }
 
-void Mat3::Clean() {
+void Mat3::clean() {
 	for (int i = 0; i < 9; i++)
 		if (fabs(entry[i]) < CloseTozero)
 			entry[i] = 0.f;
 }
 
-float Mat3::Get(int i, int j) {
+float Mat3::get(int i, int j) {
 	return entry[i * 3 + j];
 }
 

@@ -11,23 +11,23 @@ Quat::Quat(float theta, Vec4 axis) {
 	x = axis.x * s;
 	y = axis.y * s;
 	z = axis.z * s;
-	Clean();
-	Normalize();
+	clean();
+	normalize();
 }
 
-const void Quat::Clean() {
+void Quat::clean() {
 	if (fabs(t) < CloseToZero) t = 0.0f;
 	if (fabs(x) < CloseToZero) x = 0.0f;
 	if (fabs(y) < CloseToZero) y = 0.0f;
 	if (fabs(z) < CloseToZero) z = 0.0f;
 }
 
-Quat Quat::Normalize() const {
-	return *this*(1 / Magnitude());
+Quat Quat::normalize() const {
+	return *this*(1 / magnitude());
 }
 
-const void Quat::ToAngleAxis(float& theta, Vec4& axis) {
-	Normalize();
+const void Quat::toAngleAxis(float& theta, Vec4& axis) const {
+	normalize();
 	theta = 2.0f * acos(t) * RADIANS_TO_DEGREES;
 	float s = sqrt(1.0f - t*t);
 	if (s < CloseToZero) {
@@ -44,15 +44,15 @@ const void Quat::ToAngleAxis(float& theta, Vec4& axis) {
 	}
 }
 
-const float Quat::Quadrance() const {
+const float Quat::quadrance() const {
 	return t*t + x*x + y*y + z*z;
 }
 
-const float Quat::Magnitude() const {
-	return sqrt(Quadrance());
+float Quat::magnitude() const {
+	return sqrt(quadrance());
 }
 
-const Quat Quat::Conjugate() const {
+const Quat Quat::conjugate() const {
 	return Quat{ t, -x, -y, -z };
 }
 
@@ -88,7 +88,7 @@ Quat Quat::operator*(const float s) const {
 }
 
 Mat4 Quat::toMatrix() {
-	Normalize();
+	normalize();
 	float xx = x * x;
 	float xy = x * y;
 	float xz = x * z;
@@ -105,34 +105,38 @@ Mat4 Quat::toMatrix() {
 		0, 0, 0, 1
 	};
 
-	matrix.Clean();
+	matrix.clean();
 	return matrix;
 }
 
-bool Quat::operator==(const Quat q) {
+bool Quat::operator==(const Quat q) const {
 	return (fabs(t - q.t) < CloseToZero && fabs(x - q.x) < CloseToZero &&
 		fabs(y - q.y) < CloseToZero && fabs(z - q.z) < CloseToZero);
 }
 
-Quat Quat::Inverse() {
-	return Conjugate() * (1.0f / Quadrance());
+bool Quat::operator!=(const Quat q) const {
+	return !((*this) == q);
 }
 
-Quat Quat::Lerp(Quat start, const Quat target, float k) {
-	float cos_angle = target.x*start.x + target.y*start.y + target.z*start.z + target.t*start.t;
+Quat Quat::inverse() const {
+	return conjugate() * (1.0f / quadrance());
+}
+
+Quat Quat::lerp(const Quat start, const Quat target, const float k) {
+	float cos_angle = start.x*target.x + start.y*target.y + start.z*target.z + start.t*target.t;
 	float k0 = 1.0f - k;
 	float k1 = (cos_angle > 0) ? k : -k;
-	Quat qi = target*k0 + start*k1;
-	qi.Normalize();
+	Quat qi = start*k0 + target*k1;
+	qi.normalize();
 	return qi;
 }
 
-Quat Quat::Slerp(const Quat target, float k) {
-	float angle = acos(x*target.x + y*target.y + z*target.z + t*target.t);
+Quat Quat::slerp( Quat start,  Quat target, const float k) {
+	float angle = acos(start.x*target.x + start.y*target.y + start.z*target.z + start.t*target.t);
 	float k0 = sin((1 - k)*angle) / sin(angle);
 	float k1 = sin(k*angle) / sin(angle);
-	Quat qi = (*this)*k0 + target*k1;
-	qi.Normalize();
+	Quat qi = start*k0 + target*k1;
+	qi.normalize();
 	return qi;
 }
 

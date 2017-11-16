@@ -6,8 +6,8 @@
 SceneNode::SceneNode() : ModelUniform(-1), ColorUniform(-1), State(Vec3(0, 0, 0), Quat(0, Vec4(0, 0, 1, 1))) {
 	//sanity check
 	Parent = nullptr;
-	LocalMatrix = MatrixFactory::Identity();
-	WorldMatrix = MatrixFactory::Identity();
+	LocalMatrix = MatrixFactory::identity();
+	WorldMatrix = MatrixFactory::identity();
 	NodeMesh = nullptr;
 	ShaderProg = nullptr;
 
@@ -66,7 +66,7 @@ void SceneNode::setColor(const Vec4 c) {
 }
 
 void SceneNode::applyTranslation(Vec3 t) {
-	LocalMatrix = MatrixFactory::Translate(t) * LocalMatrix;
+	LocalMatrix = MatrixFactory::translate(t) * LocalMatrix;
 	State.position += t;
 }
 

@@ -32,43 +32,43 @@ float Mat2::Get(int i, int j) {
 	return entry[i + j * 2];
 }
 
-Mat2 Mat2::Identity() {
+Mat2 Mat2::identity() {
 	return Mat2(1.0f);
 }
 
-Mat2 Mat2::Rotate(float angle) {
+Mat2 Mat2::rotate(float angle) {
 	return Mat2 {
 		cos(angle), -sin(angle),
 		sin(angle), cos(angle)
 	};
 }
 
-Mat2 Mat2::Scale(const Vec2& s) {
+Mat2 Mat2::scale(const Vec2& s) {
 	return Mat2{
 		s.x, 0,
 		0, s.y
 	};
 }
 
-Mat2 Mat2::Transpose(const Mat2& m) {
+Mat2 Mat2::transpose(const Mat2& m) {
 	return Mat2{
 		m.entry[0], m.entry[2],
 		m.entry[1], m.entry[3],
 	};
 }
 
-Mat2 Mat2::Inverse(Mat2& matrix) {
-	float det = matrix.Determinant();
+Mat2 Mat2::inverse(Mat2& matrix) {
+	float det = matrix.determinant();
 	if (det == 0) throw DerterminatEqualsZero();
 	float invDet = 1 / det;
 	return invDet * Mat2{ matrix.entry[3], -matrix.entry[1], -matrix.entry[2], matrix.entry[0] };
 }
 
-float Mat2::Determinant() {
+float Mat2::determinant() {
 	return entry[0] * entry[3] - entry[1] * entry[2];
 }
 
-Mat2 operator*(Mat2 left, const Mat2& right) {
+Mat2 operator*(const Mat2 left, const Mat2& right) {
 	float temp[4];
 	for (int row = 0; row < 2; row++)
 		for (int col = 0; col < 2; col++) {
@@ -96,7 +96,7 @@ Mat2 Mat2::operator*=(const Mat2& other) {
 	return *this;
 }
 
-Mat2 operator+(Mat2 left, const Mat2& right) {
+Mat2 operator+(const Mat2 left, const Mat2& right) {
 	float temp[4];
 	for (int i = 0; i < 4; i++)
 		temp[i] = left.entry[i] + right.entry[i];
@@ -109,7 +109,7 @@ Mat2 Mat2::operator+=(const Mat2& other) {
 	return *this;
 }
 
-Mat2 operator-(Mat2 left, const Mat2& right) {
+Mat2 operator-(const Mat2 left, const Mat2& right) {
 	float temp[4];
 	for (int i = 0; i < 4; i++)
 		temp[i] = left.entry[i] - right.entry[i];
