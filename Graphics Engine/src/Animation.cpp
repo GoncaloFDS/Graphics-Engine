@@ -7,7 +7,6 @@ Animation::Animation(std::vector<SceneNode*> ns, std::vector<NodeState> start,
 	StartStates = start;
 	EndStates = end;
 	Duration = duration;
-	HasEnded = false;
 }
 
 void Animation::play(const float deltaTime) {
@@ -24,8 +23,14 @@ void Animation::play(const float deltaTime) {
 		}
 		currentTime += deltaTime;
 	}
-	if (currentTime > Duration)
-		HasEnded = true;
+	if (currentTime > Duration) {
+		if(Next != nullptr)
+			Next->start();
+	}
+}
+
+bool Animation::isActive() {
+	return IsActive;
 }
 
 void Animation::start() {
@@ -38,7 +43,22 @@ void Animation::stop() {
 
 void Animation::reverse() {
 	currentTime = Duration - currentTime;
-	const std::vector<NodeState> temp = StartStates;
+	const std::vector<NodeState> tempState = StartStates;
 	StartStates = EndStates;
-	EndStates = temp;
+	EndStates = tempState;
+	Animation* tempAnim = Previous;
+	Previous = Next;
+	Next = tempAnim;
+}
+
+void Animation::setPreviousAnimation(Animation* anim) {
+	Previous = anim;
+}
+
+void Animation::setNextAnimation(Animation* anim) {
+	Next = anim;
+}
+
+bool Animation::hasEnded() const {
+	return Next == nullptr;
 }

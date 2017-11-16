@@ -30,7 +30,7 @@ private:
 	static Camera MainCamera;
 	static int OldTime;
 	static float DeltaTime;
-	static bool MovementKeyPressed[6];
+	static bool MovementKeyPressed[8];
 	
 	static void createSceneMatrices();
 	static void createTangram();

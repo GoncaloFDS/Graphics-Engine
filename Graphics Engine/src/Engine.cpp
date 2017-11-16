@@ -30,7 +30,7 @@ Projection Engine::ProjectionType;
 Camera Engine::MainCamera;
 int Engine::OldTime;
 float Engine::DeltaTime;
-bool Engine::MovementKeyPressed[6];
+bool Engine::MovementKeyPressed[8];
 
 void Engine::createSceneMatrices() {
 	ShaderProgram->use();
@@ -67,7 +67,7 @@ void Engine::createTangram() {
 	bigTriangle1->setMesh(triangle);
 	bigTriangle1->setMatrix(
 		MatrixFactory::Translate(Vec3(-3, 0, 0)) *
-		MatrixFactory::Scale(Vec3(0.5, 0.5, 0.3)) 
+		MatrixFactory::Scale(Vec3(0.5, 0.5, 0.18)) 
 	);
 	bigTriangle1->setState(Vec3(-3, 0, 0), Quat(-PI / 2, Vec4(0, 0, 1, 1)).Normalize());
 	bigTriangle1->setColor(Vec4(0.77, 0.37, 0.06, 1));
@@ -77,7 +77,7 @@ void Engine::createTangram() {
 	bigTriangle2->setMesh(triangle);
 	bigTriangle2->setMatrix(
 		MatrixFactory::Translate(Vec3(-3.4, 0.15, 0)) *
-		MatrixFactory::Scale(Vec3(0.5, 0.5, 0.5))
+		MatrixFactory::Scale(Vec3(0.5, 0.5, 0.225))
 	);
 	bigTriangle2->setState(Vec3(-3.4, 0.15, 0), Quat(5 * PI / 4, Vec4(0, 0, 1, 1)).Normalize());
 	bigTriangle2->setColor(Vec4(0.1, 0.05, 0.4, 1));
@@ -87,7 +87,7 @@ void Engine::createTangram() {
 	parlNode->setMesh(prlgram);
 	parlNode->setMatrix(
 		MatrixFactory::Translate(Vec3(-3.45, -0.35, 0)) *
-		MatrixFactory::Scale(Vec3(0.25, 0.25, 0.25))
+		MatrixFactory::Scale(Vec3(0.25, 0.25, 0.125))
 	);
 	parlNode->setState(Vec3(-3.45, -0.35, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize());
 	parlNode->setColor(Vec4(1, 1, 0, 1));
@@ -98,7 +98,7 @@ void Engine::createTangram() {
 	mediumTriangle->setMesh(triangle);
 	mediumTriangle->setMatrix(
 		MatrixFactory::Translate(Vec3(-2.6, 0.15, 0)) *
-		MatrixFactory::Scale(Vec3(0.333f, 0.3333f, 0.333f))
+		MatrixFactory::Scale(Vec3(0.333f, 0.3333f, 0.1f))
 	);
 	mediumTriangle->setState(Vec3(-2.6, 0.15, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize());
 	mediumTriangle->setColor(Vec4(0.62, 0.31, 0.67, 1));
@@ -108,7 +108,7 @@ void Engine::createTangram() {
 	smallTriangle1->setMesh(triangle);
 	smallTriangle1->setMatrix(
 		MatrixFactory::Translate(Vec3(-2.9, -0.7, 0)) *
-		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
+		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.22f))
 	);
 	smallTriangle1->setState(Vec3(-2.9, -0.7, 0), Quat(0, Vec4(0, 0, 1, 1)).Normalize());
 	smallTriangle1->setColor(Vec4(0.24, 0.11, 0.36, 1));
@@ -118,7 +118,7 @@ void Engine::createTangram() {
 	cubeNode->setMesh(cube);
 	cubeNode->setMatrix(
 		MatrixFactory::Translate(Vec3(-2.15, 0.1, 0)) *
-		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
+		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.13f))
 	);
 	cubeNode->setState(Vec3(-2.15, 0.1, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize());
 	cubeNode->setColor(Vec4(0.24, 0.5, 0.19, 1));
@@ -129,7 +129,7 @@ void Engine::createTangram() {
 	smallTriangle2->setMesh(triangle);
 	smallTriangle2->setMatrix(
 		MatrixFactory::Translate(Vec3(-2.15, -0.25, 0)) *
-		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.25f))
+		MatrixFactory::Scale(Vec3(0.25f, 0.25f, 0.2f))
 	);
 	smallTriangle2->setState(Vec3(-2.15, -0.25, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).Normalize());
 	smallTriangle2->setColor(Vec4(0.83, 0.11, 0.09, 1));
@@ -175,7 +175,10 @@ void Engine::createTangram() {
 	anim1 = new Animation(nodes, startStates, checkpoint1, 5.f);
 	anim2 = new Animation(nodes, checkpoint1, checkpoint2, 5.f);
 	anim3 = new Animation(nodes, checkpoint2, endStates, 5.f);
-	//anim1->start();
+	anim1->setNextAnimation(anim2);
+	anim2->setNextAnimation(anim3);
+	anim2->setPreviousAnimation(anim1);
+	anim3->setPreviousAnimation(anim2);
 }
 
 Engine::Engine(int argc, char* argv[], const Vec2 win) {
@@ -238,10 +241,6 @@ void Engine::display() {
 	anim1->play(DeltaTime);
 	anim2->play(DeltaTime);
 	anim3->play(DeltaTime);
-	if (anim1->HasEnded)
-		anim2->start();
-	if (anim2->HasEnded)
-		anim3->start();
 	drawScene();
 	glutSwapBuffers();
 }
@@ -253,48 +252,36 @@ void Engine::cleanUp() {
 }
 
 void Engine::keyboardInput(unsigned char key, int x, int y) {
-	if(key == 'p') {
+	if(key == 'p') 
 		switchProjection();
-	}
-	if(key == 'a') {
+	if(key == 'a') 
 		MovementKeyPressed[0] = true;
-	}
-	if(key == 'd') {
+	if(key == 'd') 
 		MovementKeyPressed[1] = true;
-	}
-	if(key == 'w') {
+	if(key == 'w') 
 		MovementKeyPressed[2] = true;
-	}
-	if(key == 's') {
+	if(key == 's') 
 		MovementKeyPressed[3] = true;
-	}
-	if(key == 'e') {
+	if(key == 'e') 
 		MovementKeyPressed[4] = true;
-	}
-	if(key == 'q') {
+	if(key == 'q') 
 		MovementKeyPressed[5] = true;
-	}
+		
 }
 
 void Engine::keyUpFunc(unsigned char key, int x, int y) {
-	if (key == 'a') {
+	if (key == 'a') 
 		MovementKeyPressed[0] = false;
-	}
-	if (key == 'd') {
+	if (key == 'd') 
 		MovementKeyPressed[1] = false;
-	}
-	if (key == 'w') {
+	if (key == 'w') 
 		MovementKeyPressed[2] = false;
-	}
-	if (key == 's') {
+	if (key == 's') 
 		MovementKeyPressed[3] = false;
-	}
-	if (key == 'e') {
+	if (key == 'e') 
 		MovementKeyPressed[4] = false;
-	}
-	if (key == 'q') {
+	if (key == 'q') 
 		MovementKeyPressed[5] = false;
-	}
 	if (key == 'g') {
 		MainCamera.UsingQuaternions = !MainCamera.UsingQuaternions;
 		ShaderProgram->use();
@@ -305,8 +292,21 @@ void Engine::keyUpFunc(unsigned char key, int x, int y) {
 		else
 			std::cout << "Using Euler Rotation" << std::endl;
 	}
-	if (key == 'l')
-		anim1->start();
+	if (key == 't') {
+		if(!anim2->isActive() && !anim3->isActive())
+			anim1->start();
+		
+	}
+	if (key == 'r') {
+		if (anim1->hasEnded())
+			anim1->start();
+		else if (anim3->hasEnded())
+			anim3->start();
+		anim1->reverse();
+		anim2->reverse();
+		anim3->reverse();
+		
+	}
 }
 
 void Engine::processMovement() {

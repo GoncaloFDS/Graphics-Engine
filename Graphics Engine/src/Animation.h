@@ -9,15 +9,20 @@ class Animation {
 	bool IsActive;
 	float Duration;
 	float currentTime;
+	Animation* Previous = nullptr;
+	Animation* Next = nullptr;
 
 public:
-	bool HasEnded;
 	Animation(std::vector<SceneNode*> ns, std::vector<NodeState> start, 
 		std::vector<NodeState> end, float duration);
 	void play(float deltaTime);
+	bool isActive();
 	void start();
 	void stop();
 	void reverse();
+	void setPreviousAnimation(Animation* anim);
+	void setNextAnimation(Animation* anim);
+	bool hasEnded() const;
 };
 
 
