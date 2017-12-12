@@ -12,10 +12,15 @@ uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform	mat4 ProjectionMatrix;
 
+uniform vec4 plane;
+
 void main(void) {
+	vec4 worldPosition = ModelMatrix * vec4(inPosition, 1);
 	exPosition = inPosition;
 	exTexcoord = inTexture;
 	exNormal = inNormal;
 
-	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(inPosition, 1);
+	gl_ClipDistance[0] = dot(worldPosition, plane);
+
+	gl_Position = ProjectionMatrix * ViewMatrix * worldPosition;
 }

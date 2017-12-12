@@ -68,7 +68,7 @@ GLuint Shader::bindAttribute(const char* attributeName) {
 	// Add the attribute location value for the attributeName key
 	AttributeMap[attributeName] = glGetAttribLocation(Id, attributeName);
 
-	// Check to ensure that the ShaderProgram contains an attribute with this name
+	// Check to ensure that the simpleShader contains an attribute with this name
 	if (AttributeMap[attributeName] == -1) {
 		std::cout << "Could not add attribute: " << attributeName;
 	}

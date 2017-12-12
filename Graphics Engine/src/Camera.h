@@ -16,25 +16,32 @@ enum movementDir {
 };
 
 class Camera {
-private:
-	float MovementSpeed;
-	float MouseSensivity;
+	Vec3 front;
+	Vec3 right;
+	Vec3 up;
+	Vec3 worldUp;
 
-	Vec2 LastMouse;
-	bool LeftButtonPressed = false;
-	bool FirstMouseInput = true;
-	Vec3 RotationRodrigues;
-	float ZoomDistance;
-	Quat Q;
-	Mat4 R;
-	Vec3 RotationDeltaQ;
+	float movementSpeed;
+	float mouseSensivity;
 
+	float yaw;
+	float pitch;
+	Vec2 lastMouse;
+	bool leftButtonPressed = false;
+	bool firstMouseInput = true;
+	float frontDist;
+	Mat4 projMat;
+	Mat4 cubeMat;
+	
 public:
 	Camera() = default;
 	Camera(Vec3 pos, Vec3 center);
 	~Camera() = default;
-	Vec3 Position;
-	Mat4 ViewMatrix;
+	Mat4 getProjectionMatrix();
+	void setProjectionMatrix(const Mat4& mat4);
+	void invertPitch();
+	Vec3 position;
+	Mat4 viewMatrix;
 	bool UsingQuaternions;
 
 	void setLeftButton(bool b);
@@ -42,6 +49,7 @@ public:
 
 	void moveCamera(movementDir dir, float deltaTime);
 	void moveMouse(int x, int y, Vec2 screen);
+	Mat4 getCubeMatrix();
 	Mat4 getViewMatrix();
 
 };

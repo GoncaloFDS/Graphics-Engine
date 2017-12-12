@@ -9,79 +9,85 @@ float radians(const float degrees) {
 }
 
 Camera::Camera(const Vec3 pos, const Vec3 center) {
-	Position = pos;
-	MovementSpeed = 3.f;
-	MouseSensivity = 0.005f;
-	RotationRodrigues = { 0, 0, 0 };
-	RotationDeltaQ = { 0, 0, 0 };
-	ViewMatrix = MatrixFactory::translate(pos);
-	ZoomDistance = 0;
-	UsingQuaternions = false;
-	Q = Quat(1, 0, 0, 0);
-	R = MatrixFactory::identity();
+	position = pos;
+	front = center - position;
+	worldUp = Vec3(0, 1, 0);
+	right = front.Cross(worldUp);
+	up = right.Cross(front);
+	front.Normalize();
+	right.Normalize();
+	up.Normalize();
+	cubeMat = MatrixFactory::identity();
+	movementSpeed = 3.f;
+	mouseSensivity = 0.002f;
+}
+
+Mat4 Camera::getProjectionMatrix() {
+	return projMat;
+}
+
+void Camera::setProjectionMatrix(const Mat4& mat4) {
+	projMat = mat4;
+}
+
+void Camera::invertPitch() {
+	//RotationRodrigues.y = -RotationRodrigues.y;
 }
 
 
 void Camera::setLeftButton(const bool b) {
-	LeftButtonPressed = b;
+	leftButtonPressed = b;
 }
 
 void Camera::setIsFirstMouseInput(const bool b) {
-	FirstMouseInput = b;
+	firstMouseInput = b;
 }
 
 void Camera::moveCamera(const movementDir dir, const float deltaTime) {
-	const float velocity = MovementSpeed * deltaTime;
+	const float velocity = movementSpeed * deltaTime;
 	if (dir == Forward)
-		ZoomDistance += velocity;
+		position += front * velocity;
 	if (dir == Backward)
-		ZoomDistance -= velocity;
-	if (dir == Up) {
-		RotationRodrigues.z += velocity;
-		RotationDeltaQ.z = velocity;
-	}
-	if (dir == Down) {
-		RotationRodrigues.z -= velocity;
-		RotationDeltaQ.z = -velocity;
-	}
+		position -= front * velocity;
+	if (dir == Right)
+		position += right * velocity;
+	if (dir == Left)
+		position -= right * velocity;
+	if (dir == Up)
+		position += up * velocity;
+	if (dir == Down)
+		position -= up * velocity;
 }
 
 void Camera::moveMouse(int x, int y, Vec2 screen) {
-	if (LeftButtonPressed) {
-		if (FirstMouseInput) {
-			LastMouse.x = x;
-			LastMouse.y = y;
-			FirstMouseInput = false;
+	if (leftButtonPressed) {
+		if (firstMouseInput) {
+			lastMouse.x = x;
+			lastMouse.y = y;
+			firstMouseInput = false;
 		}
 
-		RotationRodrigues.x += (LastMouse.x - x) * MouseSensivity;
-		RotationRodrigues.y += (LastMouse.y - y) * MouseSensivity;
+		Vec2 offset(lastMouse.x - x, lastMouse.y - y);
+		lastMouse.x = x;
+		lastMouse.y = y;
 
-		RotationDeltaQ.x = (LastMouse.x - x) *0.5f ;
-		RotationDeltaQ.y = (LastMouse.y - y) *0.5f;
+		offset.x *= mouseSensivity;
+		offset.y *= mouseSensivity;
 
-		LastMouse.x = x;
-		LastMouse.y = y;
-
+		Mat4 rotator = MatrixFactory::rotate(offset.y, right) *  MatrixFactory::rotate(offset.x, up);
+		//cubeMat = rotator * cubeMat;
+		front = Mat3(rotator) * front;
+		up = Mat3(rotator) * up;
+		up.x = 0;
+		right = front.Cross(up);
+		front.Normalize();
+		right.Normalize();
+		up.Normalize();
 	}
 }
 
+
 Mat4 Camera::getViewMatrix() {
-	if(!UsingQuaternions) {
-		R = MatrixFactory::rotate(RotationRodrigues.x, Vec3(0, 1, 0)) *
-			MatrixFactory::rotate(RotationRodrigues.y, Vec3(1, 0, 0)) *
-			MatrixFactory::rotate(RotationRodrigues.z, Vec3(0, 0, 1)) ;
-
-		ViewMatrix = MatrixFactory::translate(Vec3(0, 0, Position.z + ZoomDistance)) * R;
-
-	}
-	else {
-		Q = Quat(RotationDeltaQ.x *0.01, Vec4(0, 1, 0, 1)) * 
-			Quat(RotationDeltaQ.y *0.01, Vec4(1, 0, 0, 1)) *
-			Quat(RotationDeltaQ.z, Vec4(0, 0, 1, 1)) * Q;
-		RotationDeltaQ = { 0, 0, 0 };
-		ViewMatrix = MatrixFactory::translate(Vec3(0, 0, Position.z + ZoomDistance)) * Q.toMatrix();
-	}
+	return MatrixFactory::lookAt(position, position + front, up);
 	
-	return ViewMatrix;
 }

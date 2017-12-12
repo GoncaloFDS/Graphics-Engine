@@ -1,21 +1,17 @@
 ﻿#include "Engine.h"
-#include "MatrixFactory.h"
-#include "Shader.h"
-#include "Mesh.h"
-#include "SceneGraph.h"
-#include "Animation.h"
-#include "Animator.h"
-
 
 //TODO: create Singletons to remove golbal variables
 SceneGraph* sceneGraph;
 SceneNode* sceneWrapper;
 Animator* animator;
+Water* water;
+Shader* waterShader;
+
 int Engine::WindowHandle;
 int Engine::FrameCount;
 Vec2 Engine::WindowSize;
 std::string Engine::Caption;
-Shader* Engine::ShaderProgram;
+Shader* Engine::simpleShader;
 Projection Engine::ProjectionType;
 Camera Engine::MainCamera;
 int Engine::OldTime;
@@ -24,14 +20,31 @@ bool Engine::MovementKeyPressed[8];
 
 //TODO: Replace Methods that should be on the main cpp
 
+Engine::Engine(int argc, char* argv[], const Vec2 win) {
+	WindowSize = win;
+	WindowHandle = 0;
+	FrameCount = 0;
+	Caption = "CGJ Engine";
+	MainCamera = Camera(Vec3(0, 0, 15), Vec3(0, 0, 0));
+
+	setUpGlut(argc, argv, win);
+	setUpGlew();
+	setUpOpenGl();
+	water = new Water();
+
+	createShaders();
+	createScene();
+
+	createSceneMatrices();
+	setUpCallBacks();
+
+	OldTime = glutGet(GLUT_ELAPSED_TIME);
+}
+
 void Engine::createSceneMatrices() {
-	ShaderProgram->use();
-
-	GLuint viewLoc = ShaderProgram->getUniform("ViewMatrix");
-	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
-
-	GLuint projLoc = ShaderProgram->getUniform("ProjectionMatrix");
-	glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::perspective(PI / 6.f, WindowSize.x/WindowSize.y, 1, 50).entry);
+	simpleShader->use();
+	
+	MainCamera.setProjectionMatrix( MatrixFactory::perspective(PI / 6.f, WindowSize.x / WindowSize.y, 1, 50));
 	ProjectionType = Projection::Perspective;
 }
 
@@ -77,27 +90,43 @@ void Engine::createAnimations(std::vector<SceneNode*> nodes) {
 	animator->addAnimation(anim3);
 }
 
-void Engine::createTangram() {
+void Engine::createScene() {
+
+	/*sky = new CubeMap();
+	sky->createCubeMap("cubeMap/negz.jpg", "cubeMap/posz.jpg", "cubeMap/posy.jpg",
+		"cubeMap/negy.jpg", "cubeMap/negx.jpg", "cubeMap/posx.jpg");
+	sky->setShader(skyShader);*/
 
 	Mesh* cube = new Mesh(std::string("meshes/cube_v.obj"));
 	Mesh* triangle = new Mesh(std::string("meshes/triangle_v.obj"));
 	Mesh* prlgram = new Mesh(std::string("meshes/parallelogram_v.obj"));
+	Mesh* plane = new Mesh(std::string("meshes/waterPlane.obj"));
 	std::vector<SceneNode*> nodes;
 	sceneGraph = new SceneGraph();
 
 	SceneNode* n = sceneGraph->getRoot();
-	n->setShader(ShaderProgram);
+	n->setShader(simpleShader);
 
 	sceneWrapper = sceneGraph->createNode();
 
-	SceneNode* table = sceneWrapper->createNode();
-	table->setMesh(cube);
-	table->setMatrix(
-		MatrixFactory::translate(Vec3(0, 0, -.2)) *
-		MatrixFactory::rotate(-PI / 4, Vec3(0, 0, 1)) *
-		MatrixFactory::scale(Vec3(6, 6, 0.1))
+	SceneNode* water = sceneGraph->createNode();
+	water->setMesh(plane);
+	water->setMatrix(
+		MatrixFactory::translate(Vec3(0, 0, 0.1)) *
+		MatrixFactory::rotate(PI /2, Vec3(1, 0, 0)) *
+		MatrixFactory::scale(Vec3(5, 1, 5)) 		
 	);
-	table->setColor(Vec4(0.38, 0.25, 0.09, 1));
+	water->setColor(Vec4(0.08, 0.05, 0.9, 1));
+	water->setShader(waterShader);
+
+	SceneNode* sky = sceneWrapper->createNode();
+	sky->setMesh(plane);
+	sky->setMatrix(
+		MatrixFactory::translate(Vec3(0, 0, 15)) *
+		MatrixFactory::rotate(-PI / 2, Vec3(1, 0, 0)) *
+		MatrixFactory::scale(Vec3(5, 1, 5))		
+	);
+	sky->setColor(Vec4(0.08, 0.5, 0.5, 1));
 
 	SceneNode* bigTriangle1 = sceneWrapper->createNode();
 	bigTriangle1->setMesh(triangle);
@@ -174,24 +203,6 @@ void Engine::createTangram() {
 	createAnimations(nodes);
 }
 
-Engine::Engine(int argc, char* argv[], const Vec2 win) {
-	WindowSize = win;
-	WindowHandle = 0;
-	FrameCount = 0;
-	Caption = "CGJ Engine";
-	MainCamera = Camera(Vec3(0 , 0, -15), Vec3(0, 0, 0));
-
-	setUpGlut(argc, argv, win);
-	setUpGlew();
-	setUpOpenGl();
-	createShaderProgram();
-	createTangram();
-
-	createSceneMatrices();
-	setUpCallBacks();
-
-	OldTime = glutGet(GLUT_ELAPSED_TIME);
-}
 
 void Engine::timer(int value) {
 
@@ -207,10 +218,14 @@ void Engine::timer(int value) {
 void Engine::reshape(int x, int y) {
 	WindowSize.x = static_cast<float>(x);
 	WindowSize.y = static_cast<float>(y);
-	ShaderProgram->use();
-	GLuint projLoc = ShaderProgram->getUniform("ProjectionMatrix");
-	glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::perspective(PI / 6.f, WindowSize.x / WindowSize.y, 1, 50).entry);
+	simpleShader->use();
+	MainCamera.setProjectionMatrix( MatrixFactory::perspective(PI / 6.f, WindowSize.x / WindowSize.y, 1, 50));
+	
 	glViewport(0, 0, x, y);
+}
+
+Vec2 Engine::getDisplaySize() {
+	return WindowSize;
 }
 
 void Engine::idle() {
@@ -221,8 +236,62 @@ void Engine::idle() {
 	glutPostRedisplay();
 }
 
+void Engine::updateViewProjectionMatrices() {
+	Mat4 viewMat = MainCamera.getViewMatrix();
+	Mat4 projMat = MainCamera.getProjectionMatrix();
+	simpleShader->use();
+	GLuint v = simpleShader->getUniform("ViewMatrix");
+	GLuint p = simpleShader->getUniform("ProjectionMatrix");
+	glUniformMatrix4fv(v, 1, GL_TRUE, viewMat.entry);
+	glUniformMatrix4fv(p, 1, GL_TRUE, projMat.entry);
+
+	waterShader->use();
+	v = waterShader->getUniform("ViewMatrix");
+	p = waterShader->getUniform("ProjectionMatrix");
+	glUniformMatrix4fv(v, 1, GL_TRUE, viewMat.entry);
+	glUniformMatrix4fv(p, 1, GL_TRUE, projMat.entry);
+	waterShader->detach();
+
+}
+
 void Engine::drawScene() {
 	sceneGraph->update(); // TODO: remove from every frame
+	glEnable(GL_CLIP_DISTANCE0);
+	
+	//render reflection texture
+	water->bindReflectionBuffer();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//
+	const float distance = 2 * (MainCamera.position.z - 0.1); // hardcoded water positio FIXME
+	//MainCamera.position.z += distance;
+	//MainCamera.invertPitch();
+	// updateViewProjectionMatrices();
+	simpleShader->use();
+	glUniform4f(simpleShader->getUniform("plane"), 0, 0, 1, -0.1);
+	
+	sceneGraph->draw();
+	//MainCamera.position.z -= distance;
+	//MainCamera.invertPitch();
+	//updateViewProjectionMatrices();
+
+	//render refraction texture
+	water->bindRefractionBuffer();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	simpleShader->use();
+	glUniform4f(simpleShader->getUniform("plane"), 0, 0, -1, 0.1);
+	sceneGraph->draw();
+
+	//render to screen
+
+
+	glDisable(GL_CLIP_DISTANCE0);
+	water->unbindCurrentFrameBuffer();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, water->getReflectionTexture());
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, water->getRefractionTexture());
+
 	sceneGraph->draw();
 
 	checkOpenGlError("ERROR: Could not draw scene.");
@@ -232,6 +301,7 @@ void Engine::display() {
 	++FrameCount;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	animator->play(DeltaTime);
+	updateViewProjectionMatrices();
 	drawScene();
 	glutSwapBuffers();
 }
@@ -273,65 +343,52 @@ void Engine::keyUpFunc(unsigned char key, int x, int y) {
 		MovementKeyPressed[4] = false;
 	if (key == 'q') 
 		MovementKeyPressed[5] = false;
-	if (key == 'g') {
+	/*if (key == 'g') {
 		MainCamera.UsingQuaternions = !MainCamera.UsingQuaternions;
-		ShaderProgram->use();
-		GLuint viewLoc = ShaderProgram->getUniform("ViewMatrix");
-		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 		if(MainCamera.UsingQuaternions)
 			std::cout << "Using Quaternions" << std::endl;
 		else
 			std::cout << "Using Euler Rotation" << std::endl;
-	}
+	}*/
 	if (key == 't') {
 		animator->toggle();
 	}
 	if (key == 'r') {
 		animator->reverse();
 	}
+	if (key == 'm') {
+		const float distance = 2 * (MainCamera.position.z - 0.1);
+		MainCamera.position.z -= distance;
+		//MainCamera.invertPitch();
+	}
 }
 
 void Engine::processMovement() {
-	ShaderProgram->use();
-	GLuint viewLoc = ShaderProgram->getUniform("ViewMatrix");
 	if(MovementKeyPressed[0]) {
-		sceneWrapper->transformLocalMatrix(MatrixFactory::translate(Vec3(-DeltaTime * 3, 0, 0)));
+		//sceneWrapper->transformLocalMatrix(MatrixFactory::translate(Vec3(-DeltaTime * 3, 0, 0)));
 		MainCamera.moveCamera(movementDir::Left, DeltaTime);
-		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[1]) {
-		sceneWrapper->transformLocalMatrix(MatrixFactory::translate(Vec3(DeltaTime * 3, 0, 0)));
+		//sceneWrapper->transformLocalMatrix(MatrixFactory::translate(Vec3(DeltaTime * 3, 0, 0)));
 		MainCamera.moveCamera(movementDir::Right, DeltaTime);
-		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[2]) {
-		
 		MainCamera.moveCamera(movementDir::Forward, DeltaTime);
-		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[3]) {
-		
 		MainCamera.moveCamera(movementDir::Backward, DeltaTime);
-		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[4]) {
 		MainCamera.moveCamera(movementDir::Up, DeltaTime);
-		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 	if(MovementKeyPressed[5]) {
 		MainCamera.moveCamera(movementDir::Down, DeltaTime);
-		glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
 	}
 
 }
 
 void Engine::mouseMoveInput(int x, int y) {
-	ShaderProgram->use();
 	MainCamera.moveMouse(x, y, WindowSize); 
-
-	GLuint viewLoc = ShaderProgram->getUniform("ViewMatrix");
-	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, MainCamera.getViewMatrix().entry);
-
 }
 
 void Engine::mouseButtonInput(int button, int state, int x, int y) {
@@ -341,25 +398,33 @@ void Engine::mouseButtonInput(int button, int state, int x, int y) {
 	}
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) 
 		MainCamera.setLeftButton(false);
+	
 		
 }
 
-void Engine::createShaderProgram() const {
-	ShaderProgram = new Shader("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
+void Engine::createShaders() const {
+	simpleShader = new Shader("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
+	waterShader = new Shader("shaders/Water.vert", "shaders/Water.frag");
+	//skyShader = new Shader("shaders/cubeMap.vert", "shaders/cubeMap.frag");
+	
+	waterShader->use();
+	GLuint reflection = waterShader->getUniform("ReflectionTexture");
+	GLuint refraction = waterShader->getUniform("RefractionTexture");
+	glUniform1i(reflection, 0);
+	glUniform1i(refraction, 1);
 
+	
 	checkOpenGlError("ERROR: Could not create shaders.");
 }
 
 void Engine::switchProjection() {
-	ShaderProgram->use();
-	GLuint projLoc = ShaderProgram->getUniform("ProjectionMatrix");
 
 	if (ProjectionType == Projection::Ortho) {
-		glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::perspective(PI / 6.f, WindowSize.x/WindowSize.y, 1, 30).entry);
+		MainCamera.setProjectionMatrix(MatrixFactory::perspective(PI / 6.f, WindowSize.x / WindowSize.y, 1, 30));
 		ProjectionType = Projection::Perspective;
 	}
 	else if(ProjectionType == Projection::Perspective) {
-		glUniformMatrix4fv(projLoc, 1, GL_TRUE, MatrixFactory::ortho(-5, 5, 5, -5, 1, 30).entry);
+		MainCamera.setProjectionMatrix(MatrixFactory::ortho(-5, 5, 5, -5, 1, 30));
 		ProjectionType = Projection::Ortho;
 	}
 	
@@ -419,6 +484,7 @@ void Engine::setUpOpenGl() const {
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
+	glEnable(GL_CLIP_DISTANCE0);
 }
 
 void Engine::checkOpenGlError(const std::string error) {
@@ -451,3 +517,4 @@ void Engine::checkOpenGlInfo() {
 	std::cerr << "OpenGL version " << version << std::endl;
 	std::cerr << "GLSL version " << glslVersion << std::endl;
 }
+

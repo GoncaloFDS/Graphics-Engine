@@ -20,7 +20,7 @@ public:
 		Fragment
 	};
 
-	// constructor reads and builds the ShaderProgram
+	// constructor reads and builds the simpleShader
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
 	~Shader();
 
