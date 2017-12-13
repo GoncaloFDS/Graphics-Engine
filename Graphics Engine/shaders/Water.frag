@@ -15,7 +15,6 @@ vec2 clipSpaceToTexCoords(vec4 c){
 
 void main(void){
 	
-	normalize(clipSpace);
 	vec2 texCoordsReal = clipSpaceToTexCoords(clipSpace);
 	
 	vec2 RefractionTexCoords = texCoordsReal;
@@ -24,9 +23,10 @@ void main(void){
 	vec3 refractColor = texture(RefractionTexture, RefractionTexCoords).rgb;
 	vec3 reflectColor = texture(ReflectionTexture, ReflectionTexCoords).rgb;
 	
-	//vec3 finalColor = mix(reflectColor, refractColor, 0.5);
+	vec3 finalColor = mix(reflectColor, refractColor, 0.5);
+	//vec3 finalColor = mix(r, vec3(0, 0, 0.8), 0.8);
 	//vec3 finalColor = mix(reflectColor, vec3(0, 0, 1), 0.2);
-	vec3 finalColor = refractColor;
+	//vec3 finalColor = refractColor;
 	outColor = vec4(finalColor, 1.0);
 
 }

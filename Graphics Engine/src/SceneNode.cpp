@@ -65,6 +65,10 @@ void SceneNode::setColor(const Vec4 c) {
 	Color = c;
 }
 
+void SceneNode::setActive(bool b) {
+	isActive = b;
+}
+
 void SceneNode::applyTranslation(Vec3 t) {
 	LocalMatrix = MatrixFactory::translate(t) * LocalMatrix;
 	State.position += t;
@@ -83,6 +87,7 @@ void SceneNode::update() {
 }
 
 void SceneNode::draw() {
+	if(!isActive) return;
 	SceneNode* currentParent = Parent;
 	while (ShaderProg == nullptr) {
 		ShaderProg = currentParent->getShader();

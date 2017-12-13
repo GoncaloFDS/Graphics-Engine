@@ -15,6 +15,7 @@ private:
 	GLint ModelUniform;
 	GLint ColorUniform;
 	Vec4 Color;
+	bool isActive = true;
 
 public:
 	NodeState State;
@@ -31,6 +32,7 @@ public:
 	Shader* getShader() const;
 	Mat4 getWorldMatrix() const;
 	void setColor(Vec4 c);
+	void setActive(bool b);
 
 	void applyTranslation(Vec3 t);
 	void applyRotation(Quat q);

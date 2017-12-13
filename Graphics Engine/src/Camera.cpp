@@ -31,9 +31,16 @@ void Camera::setProjectionMatrix(const Mat4& mat4) {
 }
 
 void Camera::invertPitch() {
-	//RotationRodrigues.y = -RotationRodrigues.y;
+	front.z = -front.z;
+	
+	up = right.Cross(front);
+	up.x = 0;
 }
 
+
+Vec3 Camera::getFrontVector() {
+	return front;
+}
 
 void Camera::setLeftButton(const bool b) {
 	leftButtonPressed = b;
@@ -73,7 +80,7 @@ void Camera::moveMouse(int x, int y, Vec2 screen) {
 
 		offset.x *= mouseSensivity;
 		offset.y *= mouseSensivity;
-
+		pitch += offset.y;
 		Mat4 rotator = MatrixFactory::rotate(offset.y, right) *  MatrixFactory::rotate(offset.x, up);
 		//cubeMat = rotator * cubeMat;
 		front = Mat3(rotator) * front;

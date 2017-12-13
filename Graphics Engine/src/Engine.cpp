@@ -6,6 +6,7 @@ SceneNode* sceneWrapper;
 Animator* animator;
 Water* water;
 Shader* waterShader;
+SceneNode* waterNode;
 
 int Engine::WindowHandle;
 int Engine::FrameCount;
@@ -109,24 +110,25 @@ void Engine::createScene() {
 
 	sceneWrapper = sceneGraph->createNode();
 
-	SceneNode* water = sceneGraph->createNode();
-	water->setMesh(plane);
-	water->setMatrix(
-		MatrixFactory::translate(Vec3(0, 0, 0.1)) *
+	waterNode = sceneGraph->createNode();
+	waterNode->setMesh(plane);
+	waterNode->setMatrix(
+		MatrixFactory::translate(Vec3(0, 0, 0)) *
 		MatrixFactory::rotate(PI /2, Vec3(1, 0, 0)) *
 		MatrixFactory::scale(Vec3(5, 1, 5)) 		
 	);
-	water->setColor(Vec4(0.08, 0.05, 0.9, 1));
-	water->setShader(waterShader);
+	waterNode->setColor(Vec4(0.08, 0.05, 0.9, 1));
+	waterNode->setShader(waterShader);
+	waterNode->setActive(false);
 
 	SceneNode* sky = sceneWrapper->createNode();
 	sky->setMesh(plane);
 	sky->setMatrix(
-		MatrixFactory::translate(Vec3(0, 0, 15)) *
-		MatrixFactory::rotate(-PI / 2, Vec3(1, 0, 0)) *
-		MatrixFactory::scale(Vec3(5, 1, 5))		
+		MatrixFactory::translate(Vec3(0, 0, -5)) *
+		MatrixFactory::rotate(PI / 2, Vec3(1, 0, 0)) *
+		MatrixFactory::scale(Vec3(15, 1, 15))		
 	);
-	sky->setColor(Vec4(0.08, 0.5, 0.5, 1));
+	sky->setColor(Vec4(0.08, 0.35, 0.35, 1));
 
 	SceneNode* bigTriangle1 = sceneWrapper->createNode();
 	bigTriangle1->setMesh(triangle);
@@ -257,33 +259,33 @@ void Engine::updateViewProjectionMatrices() {
 void Engine::drawScene() {
 	sceneGraph->update(); // TODO: remove from every frame
 	glEnable(GL_CLIP_DISTANCE0);
-	
+	waterNode->setActive(false);
 	//render reflection texture
 	water->bindReflectionBuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//
-	const float distance = 2 * (MainCamera.position.z - 0.1); // hardcoded water positio FIXME
-	//MainCamera.position.z += distance;
-	//MainCamera.invertPitch();
-	// updateViewProjectionMatrices();
+	const float distance = 2 * (MainCamera.position.z -0); // hardcoded water positio FIXME
+	MainCamera.position.z -= distance;
+	MainCamera.invertPitch();
+	updateViewProjectionMatrices();
 	simpleShader->use();
-	glUniform4f(simpleShader->getUniform("plane"), 0, 0, 1, -0.1);
+	glUniform4f(simpleShader->getUniform("plane"), 0, 0, 1, -0);
 	
 	sceneGraph->draw();
-	//MainCamera.position.z -= distance;
-	//MainCamera.invertPitch();
-	//updateViewProjectionMatrices();
+	MainCamera.position.z += distance;
+	MainCamera.invertPitch();
+	updateViewProjectionMatrices();
 
 	//render refraction texture
 	water->bindRefractionBuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	simpleShader->use();
-	glUniform4f(simpleShader->getUniform("plane"), 0, 0, -1, 0.1);
+	glUniform4f(simpleShader->getUniform("plane"), 0, 0, -1, 0);
 	sceneGraph->draw();
 
 	//render to screen
 
-
+	waterNode->setActive(true);
 	glDisable(GL_CLIP_DISTANCE0);
 	water->unbindCurrentFrameBuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -359,7 +361,9 @@ void Engine::keyUpFunc(unsigned char key, int x, int y) {
 	if (key == 'm') {
 		const float distance = 2 * (MainCamera.position.z - 0.1);
 		MainCamera.position.z -= distance;
-		//MainCamera.invertPitch();
+		MainCamera.invertPitch();
+		std::cout << "pos " << MainCamera.position << std::endl;
+		std::cout << "front " << MainCamera.getFrontVector() << std::endl;
 	}
 }
 

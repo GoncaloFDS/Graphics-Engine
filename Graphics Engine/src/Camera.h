@@ -44,6 +44,8 @@ public:
 	Mat4 viewMatrix;
 	bool UsingQuaternions;
 
+	Vec3 getFrontVector();
+
 	void setLeftButton(bool b);
 	void setIsFirstMouseInput(bool b);
 
