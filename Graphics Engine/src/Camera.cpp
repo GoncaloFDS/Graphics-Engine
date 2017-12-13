@@ -32,9 +32,7 @@ void Camera::setProjectionMatrix(const Mat4& mat4) {
 
 void Camera::invertPitch() {
 	front.z = -front.z;
-	
-	up = right.Cross(front);
-	up.x = 0;
+	up.y = -up.y;
 }
 
 

@@ -2,6 +2,7 @@
 #include "Vec3.h"
 #include "Mat3.h"
 
+struct Vec4;
 struct Mat3;
 
 struct Mat4 {
@@ -37,6 +38,7 @@ struct Mat4 {
 	Mat4& operator-=(const Mat4& other);
 
 	friend Vec3 operator*(const Mat4& left, const Vec3& right);
+	friend Vec4 operator*(const Mat4& left, const Vec4& right);
 
 	float determinant();
 

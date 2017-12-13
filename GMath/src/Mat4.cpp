@@ -2,6 +2,7 @@
 #include "MathExceptions.h"
 #include "Mat3.h"
 #include "MatrixFactory.h"
+#include "Vec4.h"
 
 
 /* OpenGl Column major format
@@ -128,7 +129,15 @@ Mat4& Mat4::operator-=(const Mat4& other) {
 Vec3 operator*(const Mat4& left, const Vec3& right) {
 	return Vec3(left.entry[0] * right.x + left.entry[1] * right.y + left.entry[2] * right.z + left.entry[3],
 		left.entry[4] * right.x + left.entry[5] * right.y + left.entry[6] * right.z + left.entry[7],
-		left.entry[8] * right.x + left.entry[9] * right.y + left.entry[10] * right.z + left.entry[11]);
+		left.entry[8] * right.x + left.entry[9] * right.y + left.entry[10] * right.z + left.entry[11]
+		);
+}
+
+Vec4 operator*(const Mat4& left, const Vec4& right) {
+	return Vec4(left.entry[0] * right.x + left.entry[1] * right.y + left.entry[2] * right.z + left.entry[3],
+		left.entry[4] * right.x + left.entry[5] * right.y + left.entry[6] * right.z + left.entry[7],
+		left.entry[8] * right.x + left.entry[9] * right.y + left.entry[10] * right.z + left.entry[11],
+		left.entry[12] * right.x + left.entry[13] * right.y + left.entry[14] * right.z + left.entry[15]);
 }
 
 Mat4 operator*(const Mat4 left, const float scalar) {
