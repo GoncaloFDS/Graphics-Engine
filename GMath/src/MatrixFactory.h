@@ -13,6 +13,8 @@ public:
 	static Mat4 scale(const Vec3& scale);
 
 	static Mat4 transpose(const Mat4& matrix);
+	static Mat3 inverse(Mat3& m);
+	
 
 	static Mat4 crossMatrix(const Vec3& v);
 	static Mat4 sqrCrossMatrix(const Vec3& v);

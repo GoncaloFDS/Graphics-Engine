@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "MatrixFactory.h"
 
 //////////////////////////////FIXME
 bool isOpenGlError() {
@@ -137,14 +138,30 @@ Mesh::Mesh(std::string& filename) {
 }
 
 void Mesh::draw(Shader* shader) {
+	Vec3 LightPosition = Vec3(0, 0, 5);
 	glBindVertexArray(Vao);
 	shader->use();
+	if (shader->getUniform("LightPosition") != -1){
+		float light[3] = {LightPosition.x, LightPosition.y, LightPosition.z};
+		glUniform3fv(shader->getUniform("LightPosition"), 1, light);
+	}
+	
+	if (this->TexcoordsLoaded && tex != nullptr && shader->getUniform("tex") != -1) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, this->tex->TextureId);
+		glUniform1i(shader->getUniform("tex"), 0);
+	}
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)Vertices.size());
 
 	glUseProgram(0);
 	glBindVertexArray(0);
 
 	checkOpenGlError("ERROR: Could not draw scene.");
+}
+
+void Mesh::setTex(Texture* tex)
+{
+	this->tex = tex;
 }
 
 void Mesh::loadMesh(std::string& filename) {

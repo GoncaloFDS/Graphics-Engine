@@ -99,8 +99,16 @@ void SceneNode::draw() {
 		ShaderProg->use();
 		glUniformMatrix4fv(ModelUniform, 1, GL_TRUE, WorldMatrix.entry);
 		glUniform4fv(ColorUniform, 1, Color.asArray());
+		if(ShaderProg->getUniform("NormalMatrix") != -1)
+		{
+			auto NormalMatrix = MatrixFactory::transpose(MatrixFactory::inverse(Mat3(WorldMatrix)));
+			glUniformMatrix3fv(ShaderProg->getUniform("NormalMatrix"), 1, GL_TRUE, NormalMatrix.entry);
+		}
+	
 		NodeMesh->draw(ShaderProg);
 	}
+
+	
 	for (SceneNode* node : ChildNodes)
 		node->draw();
 }

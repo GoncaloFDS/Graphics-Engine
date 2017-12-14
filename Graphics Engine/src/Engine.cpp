@@ -25,7 +25,7 @@ Engine::Engine(int argc, char* argv[], const Vec2 win) {
 	WindowHandle = 0;
 	FrameCount = 0;
 	Caption = "CGJ Engine";
-	MainCamera = Camera(Vec3(0, 0, 15), Vec3(0, 0, 0));
+	MainCamera = Camera(Vec3(0,-15, 5), Vec3(0, 0, 0));
 
 	setUpGlut(argc, argv, win);
 	setUpGlew();
@@ -63,7 +63,7 @@ void Engine::createScene() {
 	Mesh* triangle = new Mesh(std::string("meshes/triangle_v.obj"));
 	Mesh* prlgram = new Mesh(std::string("meshes/parallelogram_v.obj"));
 	Mesh* plane = new Mesh(std::string("meshes/waterPlane.obj"));
-	Mesh* treeMesh = new Mesh(std::string("meshes/justtree.obj"));
+	Mesh* treeMesh = new Mesh(std::string("meshes/treeuv.obj"));
 	sceneGraph = new SceneGraph();
 
 	SceneNode* n = sceneGraph->getRoot();
@@ -91,22 +91,28 @@ void Engine::createScene() {
 	);
 	sky->setColor(Vec4(0.08, 0.35, 0.35, 1));
 
-	/*SceneNode* tree = sceneGraph->createNode();
+	SceneNode* tree = sceneGraph->createNode();
+	Texture* tex = new Texture();
+	tex->LoadTexture("textures/Blue_Oak_bark.jpg");
+	treeMesh->setTex(tex);
 	tree->setMesh(treeMesh);
 	tree->setMatrix(
-		MatrixFactory::translate(Vec3(0, 0, 0)) * 
+		MatrixFactory::translate(Vec3(0, 0, 0.8f)) * 
 		MatrixFactory::rotate(PI / 2, Vec3(1, 0, 0)) *
-		MatrixFactory::scale(Vec3(2, 2, 15))
+		MatrixFactory::scale(Vec3(2, 2, 2))
 	);
 	tree->setColor(Vec4(0.77, 0.37, 0.06, 1));
-	waterNode->setShader(normalShader);*/
+	tree->setShader(treeShader);
+
+
+
 
 
 }
 
 void Engine::createShaders() const {
 	normalShader = new Shader("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
-	treeShader = new Shader("shaders/TreeShader.vert", "shaders/TreeShader.frag");
+	treeShader = new Shader("shaders/blinn_phong_vert.glsl", "shaders/blinn_phong_frag.glsl");
 	waterShader = new Shader("shaders/Water.vert", "shaders/Water.frag");
 	//skyShader = new Shader("shaders/cubeMap.vert", "shaders/cubeMap.frag");
 
@@ -166,8 +172,10 @@ void Engine::updateViewProjectionMatrices() {
 	treeShader->use();
 	v = treeShader->getUniform("ViewMatrix");
 	p = treeShader->getUniform("ProjectionMatrix");
+	GLuint camPos = treeShader->getUniform("cameraPos");
 	glUniformMatrix4fv(v, 1, GL_TRUE, viewMat.entry);
 	glUniformMatrix4fv(p, 1, GL_TRUE, projMat.entry);
+	glUniform3f(camPos, MainCamera.position.x, MainCamera.position.y, MainCamera.position.z);
 
 	waterShader->use();
 	v = waterShader->getUniform("ViewMatrix");
@@ -193,6 +201,8 @@ void Engine::drawScene() {
 	updateViewProjectionMatrices();
 	normalShader->use();
 	glUniform4f(normalShader->getUniform("plane"), 0, 0, 1, -0);
+	treeShader->use();
+	glUniform4f(treeShader->getUniform("plane"), 0, 0, 1, -0);
 	sceneGraph->draw();
 	MainCamera.position.z += distance;
 	MainCamera.invertPitch();
@@ -203,6 +213,8 @@ void Engine::drawScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	normalShader->use();
 	glUniform4f(normalShader->getUniform("plane"), 0, 0, -1, 0);
+	treeShader->use();
+	glUniform4f(treeShader->getUniform("plane"), 0, 0, -1, -0);
 	sceneGraph->draw();
 
 	//render to screen

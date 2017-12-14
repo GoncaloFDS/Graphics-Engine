@@ -11,9 +11,10 @@ in vec3 exNormal;
 
 out vec4 FragmentColor;
 
-const vec3 ambient_color = vec3(0.545, 0.270, 0.074);
-const vec3 diffuse_color = vec3(0.745, 0.470, 0.274);
-const vec3 specular_color = vec3(0.633, 0.727811, 0.633);
+const vec3 ambient_color = vec3(0.025, 0.025, 0.025);
+const vec3 diffuse_color = vec3(0.40, 0.40, 0.40);
+const vec3 specular_color = vec3(1.0, 0.0, 0.0);
+
 const float shininess = 128.0 * 0.6;
 
 void main(){
@@ -26,7 +27,7 @@ void main(){
 	vec3 N = normalize(exNormal);
 	float diffuse_component = max(dot(N, L),0);
 	float specular_component = pow(max(dot(H, N),0),shininess);
-	//FragmentColor = vec4(vec3(ambient_color + diffuse_component*diffuse_color + specular_component * specular_color), 1.0);
+	FragmentColor = vec4(vec3(ambient_color + diffuse_component*diffuse_color + specular_component * specular_color), 1.0);
 	//FragmentColor = vec4(vec3(ambient_color + diffuse_component*diffuse_color + specular_component * specular_color), 1.0) + texture(tex, exTexCoord);
-	FragmentColor = texture(tex,exTexCoord);
+	//FragmentColor = texture(tex,exTexCoord);
 }

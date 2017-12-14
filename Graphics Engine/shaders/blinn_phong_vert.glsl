@@ -22,12 +22,14 @@ void main(void)
 	exPosition = inPosition;
 	exTexCoord = inTexCoord;
 	exNormal = inNormal;
-	
+	mat4 normMat = transpose(inverse(ViewMatrix*ModelMatrix));
 	vec4 MCPosition = vec4(inPosition, 1.0);
 	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * MCPosition;
-	exNormal = NormalMatrix * inNormal;
-	exPosition = (ModelMatrix*MCPosition).xyz;
+	exNormal = mat3(normMat) * inNormal;
+	exPosition = (ViewMatrix* ModelMatrix*MCPosition).xyz;
+	WorldModelLight = vec3(ViewMatrix * vec4(LightPosition,1.0));
 
 	vec4 clipPosition = ModelMatrix * MCPosition;
 	gl_ClipDistance[0] = dot(clipPosition, plane);
+
 }

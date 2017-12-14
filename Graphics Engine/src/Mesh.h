@@ -8,12 +8,14 @@
 #include <sstream>
 #include <string>
 #include "Shader.h"
+#include "Texture.h"
 
 #define VERTICES 0
 #define TEXCOORDS 1
 #define NORMALS 2
 
 class Mesh {
+	Texture* tex;
 	std::vector<Vec3> Vertices, VertexData;
 	std::vector<Vec2> Texcoords, TexcoordData;
 	std::vector<Vec3> Normals, NormalData;
@@ -43,7 +45,7 @@ public:
 	~Mesh() = default;
 
 	void draw(Shader* shader);
-	
+	void setTex(Texture* tex);
 	void loadMesh(std::string& filename);
 };
 
