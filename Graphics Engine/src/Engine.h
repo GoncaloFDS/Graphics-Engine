@@ -37,7 +37,6 @@ private:
 	static int FrameCount;
 	static Vec2 WindowSize;
 	static std::string Caption;
-	static Shader* simpleShader;
 	static Projection ProjectionType;
 	static Camera MainCamera;
 	static int OldTime;

@@ -5,14 +5,13 @@ SceneGraph* sceneGraph;
 SceneNode* sceneWrapper;
 Animator* animator;
 Water* water;
-Shader* waterShader;
+Shader* waterShader, *treeShader, *normalShader;
 SceneNode* waterNode;
 
 int Engine::WindowHandle;
 int Engine::FrameCount;
 Vec2 Engine::WindowSize;
 std::string Engine::Caption;
-Shader* Engine::simpleShader;
 Projection Engine::ProjectionType;
 Camera Engine::MainCamera;
 int Engine::OldTime;
@@ -43,52 +42,14 @@ Engine::Engine(int argc, char* argv[], const Vec2 win) {
 }
 
 void Engine::createSceneMatrices() {
-	simpleShader->use();
+	treeShader->use();
 	
 	MainCamera.setProjectionMatrix( MatrixFactory::perspective(PI / 6.f, WindowSize.x / WindowSize.y, 1, 50));
 	ProjectionType = Projection::Perspective;
 }
 
 void Engine::createAnimations(std::vector<SceneNode*> nodes) {
-	std::vector<NodeState> startStates;
-	std::vector<NodeState> checkpoint1;
-	std::vector<NodeState> checkpoint2;
-	std::vector<NodeState> endStates;
 	
-	for(SceneNode* node : nodes)
-		startStates.push_back(node->State);
-
-	checkpoint1.push_back(NodeState(Vec3(-3, 0, 0), Quat(-PI / 2, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint1.push_back(NodeState(Vec3(-3.4, 0.15, 0.5), Quat(5 * PI / 4, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint1.push_back(NodeState(Vec3(-3.45, -0.35, 1.5), Quat(0, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint1.push_back(NodeState(Vec3(-2.6, 0.15, 2), Quat(-PI / 4, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint1.push_back(NodeState(Vec3(-2.9, -0.7, 2.5), Quat(0, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint1.push_back(NodeState(Vec3(-2.15, 0.1, 3), Quat(-PI / 4, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint1.push_back(NodeState(Vec3(-2.15, -0.25, 3.5), Quat(-PI / 4, Vec4(0, 0, 1, 1)).normalize()));
-
-	checkpoint2.push_back(NodeState(Vec3(3, 0, 0), Quat(PI / 2, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint2.push_back(NodeState(Vec3(2.5, -0.5, 0.5), Quat(0, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint2.push_back(NodeState(Vec3(2.62, 0.38, 1.5), Quat(0, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint2.push_back(NodeState(Vec3(2.25, 0.25, 2), Quat(PI / 4, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint2.push_back(NodeState(Vec3(2.5, 0.25, 2.5), Quat(PI, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint2.push_back(NodeState(Vec3(2.25, 0, 3), Quat(0, Vec4(0, 0, 1, 1)).normalize()));
-	checkpoint2.push_back(NodeState(Vec3(2, -0.25, 3.5), Quat(-PI / 2, Vec4(0, 0, 1, 1)).normalize()));
-
-	endStates.push_back(NodeState(Vec3(3, 0, 0), Quat(PI / 2, Vec4(0, 0, 1, 1)).normalize()));
-	endStates.push_back(NodeState(Vec3(2.5, -0.5, 0), Quat(0, Vec4(0, 0, 1, 1)).normalize()));
-	endStates.push_back(NodeState(Vec3(2.62, 0.38, 0), Quat(0, Vec4(0, 0, 1, 1)).normalize()));
-	endStates.push_back(NodeState(Vec3(2.25, 0.25, 0), Quat(PI / 4, Vec4(0, 0, 1, 1)).normalize()));
-	endStates.push_back(NodeState(Vec3(2.5, 0.25, 0), Quat(PI, Vec4(0, 0, 1, 1)).normalize()));
-	endStates.push_back(NodeState(Vec3(2.25, 0, 0), Quat(0, Vec4(0, 0, 1, 1)).normalize()));
-	endStates.push_back(NodeState(Vec3(2, -0.25, 0), Quat(-PI / 2, Vec4(0, 0, 1, 1)).normalize()));
-
-	Animation* anim1 = new Animation(nodes, startStates, checkpoint1, 2.f);
-	Animation* anim2 = new Animation(nodes, checkpoint1, checkpoint2, 2.f);
-	Animation* anim3 = new Animation(nodes, checkpoint2, endStates, 2.f);
-	animator = new Animator();
-	animator->addAnimation(anim1);
-	animator->addAnimation(anim2);
-	animator->addAnimation(anim3);
 }
 
 void Engine::createScene() {
@@ -102,11 +63,11 @@ void Engine::createScene() {
 	Mesh* triangle = new Mesh(std::string("meshes/triangle_v.obj"));
 	Mesh* prlgram = new Mesh(std::string("meshes/parallelogram_v.obj"));
 	Mesh* plane = new Mesh(std::string("meshes/waterPlane.obj"));
-	std::vector<SceneNode*> nodes;
+	Mesh* treeMesh = new Mesh(std::string("meshes/justtree.obj"));
 	sceneGraph = new SceneGraph();
 
 	SceneNode* n = sceneGraph->getRoot();
-	n->setShader(simpleShader);
+	n->setShader(normalShader);
 
 	sceneWrapper = sceneGraph->createNode();
 
@@ -121,7 +82,7 @@ void Engine::createScene() {
 	waterNode->setShader(waterShader);
 	waterNode->setActive(false);
 
-	SceneNode* sky = sceneWrapper->createNode();
+	SceneNode* sky = sceneGraph->createNode();
 	sky->setMesh(plane);
 	sky->setMatrix(
 		MatrixFactory::translate(Vec3(0, 0, -5)) *
@@ -130,79 +91,33 @@ void Engine::createScene() {
 	);
 	sky->setColor(Vec4(0.08, 0.35, 0.35, 1));
 
-	SceneNode* bigTriangle1 = sceneWrapper->createNode();
-	bigTriangle1->setMesh(triangle);
-	bigTriangle1->setMatrix(
-		MatrixFactory::translate(Vec3(-3, 0, 0)) *
-		MatrixFactory::scale(Vec3(0.5, 0.5, 0.18))
+	/*SceneNode* tree = sceneGraph->createNode();
+	tree->setMesh(treeMesh);
+	tree->setMatrix(
+		MatrixFactory::translate(Vec3(0, 0, 0)) * 
+		MatrixFactory::rotate(PI / 2, Vec3(1, 0, 0)) *
+		MatrixFactory::scale(Vec3(2, 2, 15))
 	);
-	bigTriangle1->setState(Vec3(-3, 0, 0), Quat(-PI / 2, Vec4(0, 0, 1, 1)).normalize());
-	bigTriangle1->setColor(Vec4(0.77, 0.37, 0.06, 1));
-	nodes.push_back(bigTriangle1);
-
-	SceneNode* bigTriangle2 = sceneWrapper->createNode();
-	bigTriangle2->setMesh(triangle);
-	bigTriangle2->setMatrix(
-		MatrixFactory::translate(Vec3(-3.4, 0.15, 0)) *
-		MatrixFactory::scale(Vec3(0.5, 0.5, 0.225))
-	);
-	bigTriangle2->setState(Vec3(-3.4, 0.15, 0), Quat(5 * PI / 4, Vec4(0, 0, 1, 1)).normalize());
-	bigTriangle2->setColor(Vec4(0.1, 0.05, 0.4, 1));
-	nodes.push_back(bigTriangle2);
-
-	SceneNode* parlNode = sceneWrapper->createNode();
-	parlNode->setMesh(prlgram);
-	parlNode->setMatrix(
-		MatrixFactory::translate(Vec3(-3.45, -0.35, 0)) *
-		MatrixFactory::scale(Vec3(0.25, 0.25, 0.125))
-	);
-	parlNode->setState(Vec3(-3.45, -0.35, 0), Quat(0, Vec4(0, 0, 1, 1)).normalize());
-	parlNode->setColor(Vec4(1, 1, 0, 1));
-	nodes.push_back(parlNode);
+	tree->setColor(Vec4(0.77, 0.37, 0.06, 1));
+	waterNode->setShader(normalShader);*/
 
 
-	SceneNode* mediumTriangle = sceneWrapper->createNode();
-	mediumTriangle->setMesh(triangle);
-	mediumTriangle->setMatrix(
-		MatrixFactory::translate(Vec3(-2.6, 0.15, 0)) *
-		MatrixFactory::scale(Vec3(0.333f, 0.3333f, 0.1f))
-	);
-	mediumTriangle->setState(Vec3(-2.6, 0.15, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).normalize());
-	mediumTriangle->setColor(Vec4(0.62, 0.31, 0.67, 1));
-	nodes.push_back(mediumTriangle);
+}
 
-	SceneNode* smallTriangle1 = sceneWrapper->createNode();
-	smallTriangle1->setMesh(triangle);
-	smallTriangle1->setMatrix(
-		MatrixFactory::translate(Vec3(-2.9, -0.7, 0)) *
-		MatrixFactory::scale(Vec3(0.25f, 0.25f, 0.22f))
-	);
-	smallTriangle1->setState(Vec3(-2.9, -0.7, 0), Quat(0, Vec4(0, 0, 1, 1)).normalize());
-	smallTriangle1->setColor(Vec4(0.24, 0.11, 0.36, 1));
-	nodes.push_back(smallTriangle1);
+void Engine::createShaders() const {
+	normalShader = new Shader("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
+	treeShader = new Shader("shaders/TreeShader.vert", "shaders/TreeShader.frag");
+	waterShader = new Shader("shaders/Water.vert", "shaders/Water.frag");
+	//skyShader = new Shader("shaders/cubeMap.vert", "shaders/cubeMap.frag");
 
-	SceneNode* cubeNode = sceneWrapper->createNode();
-	cubeNode->setMesh(cube);
-	cubeNode->setMatrix(
-		MatrixFactory::translate(Vec3(-2.15, 0.1, 0)) *
-		MatrixFactory::scale(Vec3(0.25f, 0.25f, 0.13f))
-	);
-	cubeNode->setState(Vec3(-2.15, 0.1, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).normalize());
-	cubeNode->setColor(Vec4(0.24, 0.5, 0.19, 1));
-	nodes.push_back(cubeNode);
+	waterShader->use();
+	GLuint reflection = waterShader->getUniform("ReflectionTexture");
+	GLuint refraction = waterShader->getUniform("RefractionTexture");
+	glUniform1i(reflection, 0);
+	glUniform1i(refraction, 1);
 
 
-	SceneNode* smallTriangle2 = sceneWrapper->createNode();
-	smallTriangle2->setMesh(triangle);
-	smallTriangle2->setMatrix(
-		MatrixFactory::translate(Vec3(-2.15, -0.25, 0)) *
-		MatrixFactory::scale(Vec3(0.25f, 0.25f, 0.2f))
-	);
-	smallTriangle2->setState(Vec3(-2.15, -0.25, 0), Quat(-PI / 4, Vec4(0, 0, 1, 1)).normalize());
-	smallTriangle2->setColor(Vec4(0.83, 0.11, 0.09, 1));
-	nodes.push_back(smallTriangle2);
-
-	createAnimations(nodes);
+	checkOpenGlError("ERROR: Could not create shaders.");
 }
 
 
@@ -220,7 +135,7 @@ void Engine::timer(int value) {
 void Engine::reshape(int x, int y) {
 	WindowSize.x = static_cast<float>(x);
 	WindowSize.y = static_cast<float>(y);
-	simpleShader->use();
+	normalShader->use();
 	MainCamera.setProjectionMatrix( MatrixFactory::perspective(PI / 6.f, WindowSize.x / WindowSize.y, 1, 50));
 	
 	glViewport(0, 0, x, y);
@@ -241,9 +156,16 @@ void Engine::idle() {
 void Engine::updateViewProjectionMatrices() {
 	Mat4 viewMat = MainCamera.getViewMatrix();
 	Mat4 projMat = MainCamera.getProjectionMatrix();
-	simpleShader->use();
-	GLuint v = simpleShader->getUniform("ViewMatrix");
-	GLuint p = simpleShader->getUniform("ProjectionMatrix");
+
+	normalShader->use();
+	GLuint v = normalShader->getUniform("ViewMatrix");
+	GLuint p = normalShader->getUniform("ProjectionMatrix");
+	glUniformMatrix4fv(v, 1, GL_TRUE, viewMat.entry);
+	glUniformMatrix4fv(p, 1, GL_TRUE, projMat.entry);
+
+	treeShader->use();
+	v = treeShader->getUniform("ViewMatrix");
+	p = treeShader->getUniform("ProjectionMatrix");
 	glUniformMatrix4fv(v, 1, GL_TRUE, viewMat.entry);
 	glUniformMatrix4fv(p, 1, GL_TRUE, projMat.entry);
 
@@ -257,20 +179,20 @@ void Engine::updateViewProjectionMatrices() {
 }
 
 void Engine::drawScene() {
-	sceneGraph->update(); // TODO: remove from every frame
+	sceneGraph->update();
+	
+	
+	//render reflection texture
 	glEnable(GL_CLIP_DISTANCE0);
 	waterNode->setActive(false);
-	//render reflection texture
 	water->bindReflectionBuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//
-	const float distance = 2 * (MainCamera.position.z -0); // hardcoded water positio FIXME
+	const float distance = 2 * MainCamera.position.z;
 	MainCamera.position.z -= distance;
 	MainCamera.invertPitch();
 	updateViewProjectionMatrices();
-	simpleShader->use();
-	glUniform4f(simpleShader->getUniform("plane"), 0, 0, 1, -0);
-	
+	normalShader->use();
+	glUniform4f(normalShader->getUniform("plane"), 0, 0, 1, -0);
 	sceneGraph->draw();
 	MainCamera.position.z += distance;
 	MainCamera.invertPitch();
@@ -279,12 +201,11 @@ void Engine::drawScene() {
 	//render refraction texture
 	water->bindRefractionBuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	simpleShader->use();
-	glUniform4f(simpleShader->getUniform("plane"), 0, 0, -1, 0);
+	normalShader->use();
+	glUniform4f(normalShader->getUniform("plane"), 0, 0, -1, 0);
 	sceneGraph->draw();
 
 	//render to screen
-
 	waterNode->setActive(true);
 	glDisable(GL_CLIP_DISTANCE0);
 	water->unbindCurrentFrameBuffer();
@@ -293,7 +214,6 @@ void Engine::drawScene() {
 	glBindTexture(GL_TEXTURE_2D, water->getReflectionTexture());
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, water->getRefractionTexture());
-
 	sceneGraph->draw();
 
 	checkOpenGlError("ERROR: Could not draw scene.");
@@ -302,7 +222,7 @@ void Engine::drawScene() {
 void Engine::display() {
 	++FrameCount;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	animator->play(DeltaTime);
+	//animator->play(DeltaTime);
 	updateViewProjectionMatrices();
 	drawScene();
 	glutSwapBuffers();
@@ -404,21 +324,6 @@ void Engine::mouseButtonInput(int button, int state, int x, int y) {
 		MainCamera.setLeftButton(false);
 	
 		
-}
-
-void Engine::createShaders() const {
-	simpleShader = new Shader("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
-	waterShader = new Shader("shaders/Water.vert", "shaders/Water.frag");
-	//skyShader = new Shader("shaders/cubeMap.vert", "shaders/cubeMap.frag");
-	
-	waterShader->use();
-	GLuint reflection = waterShader->getUniform("ReflectionTexture");
-	GLuint refraction = waterShader->getUniform("RefractionTexture");
-	glUniform1i(reflection, 0);
-	glUniform1i(refraction, 1);
-
-	
-	checkOpenGlError("ERROR: Could not create shaders.");
 }
 
 void Engine::switchProjection() {
