@@ -71,5 +71,6 @@ private:
 	static void keyUpFunc(unsigned char key, int x, int y);
 	static void processMovement();
 	void setUpCallBacks();
+	static void TakeScreenshot();
 
 };

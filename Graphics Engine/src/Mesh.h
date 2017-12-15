@@ -15,7 +15,6 @@
 #define NORMALS 2
 
 class Mesh {
-	Texture* tex;
 	std::vector<Vec3> Vertices, VertexData;
 	std::vector<Vec2> Texcoords, TexcoordData;
 	std::vector<Vec3> Normals, NormalData;
@@ -44,8 +43,8 @@ public:
 	Mesh() = default;
 	~Mesh() = default;
 
-	void draw(Shader* shader);
-	void setTex(Texture* tex);
+	void draw() const;
+	
 	void loadMesh(std::string& filename);
 };
 

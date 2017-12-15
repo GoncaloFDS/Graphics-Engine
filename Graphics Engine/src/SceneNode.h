@@ -3,10 +3,13 @@
 #include "Mat4.h"
 #include "Vec4.h"
 #include "NodeState.h"
+#include "Material.h"
 
 class SceneNode {
 private:
 	SceneNode* Parent;
+	Texture* tex;
+	Material* material;
 	std::vector<SceneNode*> ChildNodes;
 	Mat4 LocalMatrix;
 	Mat4 WorldMatrix;
@@ -33,7 +36,8 @@ public:
 	Mat4 getWorldMatrix() const;
 	void setColor(Vec4 c);
 	void setActive(bool b);
-
+	void setTex(Texture* tex);
+	void setMaterial(Material* mat);
 	void applyTranslation(Vec3 t);
 	void applyRotation(Quat q);
 

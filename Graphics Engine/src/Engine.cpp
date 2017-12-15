@@ -1,4 +1,6 @@
 ﻿#include "Engine.h"
+#include "Material.h"
+#include <FreeImage.h>
 
 //TODO: create Singletons to remove golbal variables
 SceneGraph* sceneGraph;
@@ -64,6 +66,10 @@ void Engine::createScene() {
 	Mesh* prlgram = new Mesh(std::string("meshes/parallelogram_v.obj"));
 	Mesh* plane = new Mesh(std::string("meshes/waterPlane.obj"));
 	Mesh* treeMesh = new Mesh(std::string("meshes/treeuv.obj"));
+	Texture* tex = new Texture();
+	tex->LoadTexture("textures/Diffuse_Tree.png");
+	Material* material = new Material();
+	material->LoadMaterial("meshes/treeuv_real.mtl");
 	sceneGraph = new SceneGraph();
 
 	SceneNode* n = sceneGraph->getRoot();
@@ -92,9 +98,9 @@ void Engine::createScene() {
 	sky->setColor(Vec4(0.08, 0.35, 0.35, 1));
 
 	SceneNode* tree = sceneGraph->createNode();
-	Texture* tex = new Texture();
-	tex->LoadTexture("textures/Blue_Oak_bark.jpg");
-	treeMesh->setTex(tex);
+
+	tree->setTex(tex);
+	tree->setMaterial(material),
 	tree->setMesh(treeMesh);
 	tree->setMatrix(
 		MatrixFactory::translate(Vec3(0, 0, 0.8f)) * 
@@ -297,6 +303,11 @@ void Engine::keyUpFunc(unsigned char key, int x, int y) {
 		std::cout << "pos " << MainCamera.position << std::endl;
 		std::cout << "front " << MainCamera.getFrontVector() << std::endl;
 	}
+	if (key == 'b')
+	{
+		TakeScreenshot();
+	}
+	
 }
 
 void Engine::processMovement() {
@@ -362,6 +373,22 @@ void Engine::setUpCallBacks() {
 	glutKeyboardUpFunc(keyUpFunc);
 	glutMotionFunc(mouseMoveInput);
 	glutMouseFunc(mouseButtonInput);
+}
+
+void Engine::TakeScreenshot()
+{
+		BYTE* pixels = new BYTE[3 * WindowSize.x * WindowSize.y];
+		glReadPixels(0, 0, WindowSize.x, WindowSize.y, GL_BGR, GL_UNSIGNED_BYTE, pixels);
+		FIBITMAP* screenshot = FreeImage_ConvertFromRawBits(pixels, WindowSize.x, WindowSize.y, 3 * WindowSize.x, 24, 0x0000FF, 0x00FF00, 0xFF0000, false);
+		std::ostringstream os;
+		os << "Screenshots/Screenshot_" << OldTime << ".bmp";
+		std::string path = os.str();
+		FreeImage_Save(FIF_BMP, screenshot, path.c_str(), 0);
+		os.clear();
+		FreeImage_Unload(screenshot);
+		delete[] pixels;
+		std::cout << "Screenshot taken" << std::endl;
+
 }
 
 void Engine::setUpGlut(int argc, char** argv, const Vec2 win) {
