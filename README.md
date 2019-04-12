@@ -1,5 +1,7 @@
 # GameEngine CGJ 2017/18
 
-- Abrir a Solution em \projects\GameEngine.slt
-- No Visual Studio escolher o projecto GameEngine como StartUpProject
-- Colocar em Debug ou Release em x64
+- Open visual Studio Solution \projects\GameEngine.slt
+- In the Solution Explorer set GameEngine as StartUpProject
+- Run on Debug or Release using x64
+
+Final Grade: 19
