@@ -1,0 +1,39 @@
+﻿  Water.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\water.h(3): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  Mouse.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\utils\src\mouse.cpp(1): fatal error C1083: Cannot open include file: 'Mouse.h': No such file or directory
+  Keyboard.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\utils\src\keyboard.cpp(1): fatal error C1083: Cannot open include file: 'Keyboard.h': No such file or directory
+  Texture.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\texture.h(5): fatal error C1083: Cannot open include file: 'GL\glew.h': No such file or directory
+  SkyBox.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\skybox\src\skybox.cpp(1): fatal error C1083: Cannot open include file: 'SkyBox\include\SkyBox.h': No such file or directory
+  Shader.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\shader\src\shader.cpp(1): fatal error C1083: Cannot open include file: 'Shader.h': No such file or directory
+  SceneNode.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\scene\src\scenenode.cpp(1): fatal error C1083: Cannot open include file: 'SceneNode.h': No such file or directory
+  SceneGraph.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\scene\src\scenegraph.cpp(1): fatal error C1083: Cannot open include file: 'SceneGraph.h': No such file or directory
+  Mesh.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\mesh.h(9): fatal error C1083: Cannot open include file: 'Vector4.h': No such file or directory
+  Material.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\material.h(2): fatal error C1083: Cannot open include file: 'Vector3.h': No such file or directory
+  SceneManager.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\managers\src\scenemanager.cpp(1): fatal error C1083: Cannot open include file: 'SceneManager.h': No such file or directory
+  MeshManager.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\managers\src\meshmanager.cpp(1): fatal error C1083: Cannot open include file: 'MeshManager.h': No such file or directory
+  AnimationManager.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\managers\src\animationmanager.cpp(1): fatal error C1083: Cannot open include file: 'AnimationManager.h': No such file or directory
+  Main.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\mesh.h(9): fatal error C1083: Cannot open include file: 'Vector4.h': No such file or directory
+  Engine.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\engine.h(2): fatal error C1083: Cannot open include file: 'QuaternionCamera.h': No such file or directory
+  CubeMap.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\cubemap.h(6): fatal error C1083: Cannot open include file: 'GL\glew.h': No such file or directory
+  QuaternionCamera.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\cameras\src\quaternioncamera.cpp(1): fatal error C1083: Cannot open include file: 'QuaternionCamera.h': No such file or directory
+  Camera.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\cameras\src\camera.cpp(1): fatal error C1083: Cannot open include file: 'Camera.h': No such file or directory
+  Animation.cpp
+c:\users\gonca\desktop\dev\gameenginerefactorized\projects\gameengine\animation.h(4): fatal error C1083: Cannot open include file: 'Quaternion.h': No such file or directory
+  Generating Code...
